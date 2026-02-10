@@ -3,1514 +3,840 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>cPanel - Hosting Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>SiteMove - AI-Powered Website Migration Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* CSS Variables - WHMCS Design System */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8fafc;
-            --bg-tertiary: #f1f5f9;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --text-muted: #94a3b8;
-            --border-color: #e2e8f0;
-            --accent-blue: #3b82f6;
-            --accent-green: #10b981;
-            --accent-yellow: #f59e0b;
-            --accent-red: #ef4444;
-            --accent-purple: #6366f1;
-            --accent-orange: #f97316;
-            --sidebar-width: 240px;
-            --header-height: 56px;
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --radius-sm: 6px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
+            --brand-primary: #6C3CE1;
+            --brand-secondary: #00D4AA;
+            --brand-accent: #FF6B35;
+            --bg-primary: #0A0A0F;
+            --bg-secondary: #12121A;
+            --bg-tertiary: #1A1A26;
+            --bg-card: #16161F;
+            --bg-card-hover: #1E1E2A;
+            --text-primary: #F0F0F5;
+            --text-secondary: #9494A8;
+            --text-muted: #5E5E72;
+            --border: #2A2A3A;
+            --border-light: #3A3A4E;
+            --success: #00D4AA;
+            --warning: #FFB800;
+            --error: #FF4757;
+            --gradient-hero: linear-gradient(135deg, #6C3CE1 0%, #00D4AA 50%, #FF6B35 100%);
+            --gradient-card: linear-gradient(135deg, rgba(108,60,225,0.1), rgba(0,212,170,0.05));
+            --shadow-lg: 0 25px 50px rgba(0,0,0,0.5);
+            --shadow-glow: 0 0 40px rgba(108,60,225,0.3);
+            --radius: 12px;
+            --radius-lg: 20px;
         }
 
-        /* Reset */
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        html { scroll-behavior: smooth; }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            font-size: 14px;
-            line-height: 1.5;
-            color: var(--text-primary);
-            background: var(--bg-secondary);
-        }
-
-        /* App Container */
-        .app-container {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Header */
-        .top-header {
-            height: var(--header-height);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-primary);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .logo-selector {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 6px 10px;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .logo-selector:hover {
-            background: var(--bg-secondary);
-        }
-
-        .logo-icon {
-            width: 28px;
-            height: 28px;
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-            border-radius: var(--radius-sm);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo-icon svg {
-            width: 18px;
-            height: 18px;
-            stroke: white;
-            stroke-width: 2;
-            fill: none;
-        }
-
-        .logo-text {
-            font-weight: 600;
-            font-size: 15px;
             color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        .logo-text span {
-            font-size: 10px;
-            vertical-align: super;
-            color: var(--text-muted);
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(rgba(108,60,225,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(108,60,225,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
         }
 
-        .dropdown-icon {
-            color: var(--text-secondary);
-        }
-
-        .header-divider {
-            width: 1px;
-            height: 24px;
-            background: var(--border-color);
-        }
-
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav-btn {
-            width: 28px;
-            height: 28px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            background: var(--bg-primary);
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .nav-btn:hover {
-            background: var(--bg-secondary);
-            border-color: var(--text-muted);
-        }
-
-        .breadcrumb-current {
-            color: var(--text-secondary);
-            font-size: 13px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .search-box {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            min-width: 220px;
-        }
-
-        .search-box svg {
-            color: var(--text-muted);
-            flex-shrink: 0;
-        }
-
-        .search-box input {
-            border: none;
-            background: transparent;
-            outline: none;
-            font-size: 13px;
-            color: var(--text-primary);
-            flex: 1;
-            min-width: 0;
-        }
-
-        .search-box input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .search-shortcut {
-            font-size: 11px;
-            color: var(--text-muted);
-            background: var(--bg-primary);
-            padding: 2px 6px;
-            border-radius: 4px;
-            border: 1px solid var(--border-color);
-        }
-
-        .header-icon-btn {
-            width: 36px;
-            height: 36px;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border-radius: var(--radius-md);
-            transition: all 0.2s;
-            position: relative;
-        }
-
-        .header-icon-btn:hover {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-        }
-
-        .notification-dot {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            width: 8px;
-            height: 8px;
-            background: var(--accent-red);
+        .bg-orb {
+            position: fixed;
             border-radius: 50%;
-            border: 2px solid var(--bg-primary);
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .bg-orb-1 { width: 600px; height: 600px; background: rgba(108,60,225,0.12); top: -200px; right: -100px; animation: float 20s infinite; }
+        .bg-orb-2 { width: 400px; height: 400px; background: rgba(0,212,170,0.08); bottom: -100px; left: -100px; animation: float 25s infinite reverse; }
+        .bg-orb-3 { width: 300px; height: 300px; background: rgba(255,107,53,0.06); top: 50%; left: 50%; animation: float 15s infinite; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(30px, -30px); }
+            50% { transform: translate(-20px, 20px); }
+            75% { transform: translate(20px, 10px); }
         }
 
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 4px 8px 4px 12px;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: background 0.2s;
+        /* NAV */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: rgba(10,10,15,0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            height: 72px;
+            display: flex; align-items: center; justify-content: space-between;
         }
-
-        .user-profile:hover {
-            background: var(--bg-secondary);
+        .nav-brand {
+            display: flex; align-items: center; gap: 10px;
+            font-weight: 800; font-size: 22px; text-decoration: none; color: var(--text-primary);
         }
-
-        .user-name {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        /* Main Layout */
-        .main-layout {
-            display: flex;
-            flex: 1;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: var(--bg-primary);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            position: sticky;
-            top: var(--header-height);
-            height: calc(100vh - var(--header-height));
-        }
-
-        .sidebar-nav {
-            flex: 1;
-            padding: 12px;
-            overflow-y: auto;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            border-radius: var(--radius-md);
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: all 0.2s;
-            margin-bottom: 2px;
-            cursor: pointer;
-        }
-
-        .nav-item:hover {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-        }
-
-        .nav-item.active {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
-        .nav-item svg {
-            flex-shrink: 0;
-        }
-
-        .nav-badge {
-            margin-left: auto;
-            background: var(--accent-blue);
-            color: white;
-            font-size: 11px;
-            font-weight: 500;
-            padding: 2px 6px;
+        .nav-brand .logo-icon {
+            width: 36px; height: 36px;
+            background: var(--gradient-hero);
             border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 900; color: #fff;
         }
-
-        .nav-section {
-            margin-top: 20px;
+        .nav-links { display: flex; gap: 32px; align-items: center; }
+        .nav-links a {
+            color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500;
+            transition: color 0.2s;
         }
-
-        .nav-section-title {
-            display: block;
-            padding: 8px 12px;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+        .nav-links a:hover { color: var(--text-primary); }
+        .nav-actions { display: flex; gap: 12px; align-items: center; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 22px; border-radius: 10px; font-size: 14px; font-weight: 600;
+            text-decoration: none; cursor: pointer; border: none;
+            transition: all 0.2s ease;
         }
-
-        .sidebar-footer {
-            padding: 12px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
-        }
-
-        .page-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-        }
-
-        .page-header h1 {
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .page-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .btn-secondary {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 14px;
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-secondary:hover {
-            background: var(--bg-secondary);
-            border-color: var(--text-muted);
-        }
-
+        .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+        .btn-ghost:hover { color: var(--text-primary); border-color: var(--border-light); background: var(--bg-tertiary); }
         .btn-primary {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 14px;
-            background: var(--accent-orange);
-            border: none;
-            border-radius: var(--radius-md);
-            font-size: 13px;
-            font-weight: 500;
-            color: white;
-            cursor: pointer;
-            transition: all 0.2s;
+            background: var(--brand-primary); color: #fff;
+            box-shadow: 0 4px 15px rgba(108,60,225,0.4);
+        }
+        .btn-primary:hover { background: #7B4FE8; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(108,60,225,0.5); }
+        .btn-large { padding: 14px 32px; font-size: 16px; border-radius: 12px; }
+        .btn-secondary {
+            background: transparent; color: var(--text-primary);
+            border: 1px solid var(--border-light);
+        }
+        .btn-secondary:hover { background: var(--bg-tertiary); border-color: var(--text-muted); }
+
+        /* HERO */
+        .hero {
+            position: relative; z-index: 1;
+            padding: 160px 40px 100px;
+            text-align: center;
+            max-width: 900px; margin: 0 auto;
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 6px 16px 6px 8px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 13px; color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+        .hero-badge .dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .hero h1 {
+            font-size: 64px; font-weight: 800; line-height: 1.08;
+            letter-spacing: -2px; margin-bottom: 24px;
+        }
+        .hero h1 .gradient-text {
+            background: var(--gradient-hero);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: 20px; line-height: 1.6; color: var(--text-secondary);
+            max-width: 640px; margin: 0 auto 40px;
+        }
+        .hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .hero-stats {
+            display: flex; gap: 48px; justify-content: center; margin-top: 64px;
+            padding-top: 40px; border-top: 1px solid var(--border);
+        }
+        .hero-stat { text-align: center; }
+        .hero-stat .num { font-size: 32px; font-weight: 800; color: var(--text-primary); }
+        .hero-stat .label { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+        /* SECTIONS */
+        section { position: relative; z-index: 1; padding: 100px 40px; }
+        .section-container { max-width: 1200px; margin: 0 auto; }
+        .section-label {
+            display: inline-block; font-size: 12px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 2px; color: var(--brand-primary); margin-bottom: 16px;
+        }
+        .section-title {
+            font-size: 42px; font-weight: 800; line-height: 1.15;
+            letter-spacing: -1px; margin-bottom: 16px;
+        }
+        .section-subtitle {
+            font-size: 18px; color: var(--text-secondary); max-width: 600px; margin-bottom: 56px;
         }
 
-        .btn-primary:hover {
-            background: #ea580c;
-        }
-
-        /* Site Header Card */
-        .site-header-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-        }
-
-        .site-info {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .site-favicon {
-            width: 48px;
-            height: 48px;
-            border-radius: var(--radius-md);
-            background: linear-gradient(135deg, var(--accent-orange) 0%, #ea580c 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .site-details h2 {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        .site-meta {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .site-meta span {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .site-meta svg {
-            width: 14px;
-            height: 14px;
-        }
-
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 14px;
-            background: rgba(16, 185, 129, 0.1);
-            border-radius: var(--radius-md);
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--accent-green);
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--accent-green);
-            border-radius: 50%;
-        }
-
-        /* Stats Row */
-        .stats-row {
+        /* PLATFORMS */
+        .platforms-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px; margin-bottom: 40px;
+        }
+        .platform-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+        .platform-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--brand-primary);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-glow);
+        }
+        .platform-icon {
+            width: 52px; height: 52px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 14px; font-size: 22px; font-weight: 800; color: #fff;
+        }
+        .platform-card .name { font-weight: 600; font-size: 15px; }
+        .platform-card .type { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+        .platform-arrow {
+            display: flex; align-items: center; justify-content: center;
+            padding: 40px 0;
+        }
+        .arrow-line {
+            display: flex; align-items: center; gap: 16px;
+        }
+        .arrow-line .line { width: 80px; height: 2px; background: var(--border-light); }
+        .arrow-line .ai-badge {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, rgba(108,60,225,0.2), rgba(0,212,170,0.2));
+            border: 1px solid rgba(108,60,225,0.4);
+            border-radius: 100px;
+            font-size: 14px; font-weight: 700;
+            color: var(--brand-secondary);
+            animation: glow 3s infinite;
+        }
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(108,60,225,0.2); }
+            50% { box-shadow: 0 0 40px rgba(108,60,225,0.4); }
         }
 
-        .stat-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .stat-icon svg {
-            width: 22px;
-            height: 22px;
-        }
-
-        .stat-icon.blue { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); }
-        .stat-icon.green { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); }
-        .stat-icon.purple { background: rgba(99, 102, 241, 0.1); color: var(--accent-purple); }
-        .stat-icon.orange { background: rgba(249, 115, 22, 0.1); color: var(--accent-orange); }
-
-        .stat-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .stat-label {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .stat-trend {
-            font-size: 12px;
-            font-weight: 500;
-            margin-top: 4px;
-        }
-
-        .stat-trend.up { color: var(--accent-green); }
-        .stat-trend.down { color: var(--accent-red); }
-
-        /* Dashboard Grid */
-        .dashboard-grid {
+        .dest-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 16px;
-            margin-bottom: 24px;
         }
+        .dest-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px 24px; text-align: center;
+            transition: all 0.3s ease;
+        }
+        .dest-card:hover {
+            border-color: var(--brand-secondary);
+            background: var(--bg-card-hover);
+            transform: translateY(-4px);
+        }
+        .dest-card .icon { font-size: 36px; margin-bottom: 12px; }
+        .dest-card .name { font-weight: 700; font-size: 18px; margin-bottom: 8px; }
+        .dest-card .desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
 
-        /* Widgets */
-        .widget {
+        /* HOW IT WORKS */
+        .steps-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 24px; position: relative;
+        }
+        .steps-grid::before {
+            content: '';
+            position: absolute; top: 50px;
+            left: calc(16.67% + 12px); right: calc(16.67% + 12px);
+            height: 2px;
+            background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+            opacity: 0.3;
+        }
+        .step-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 40px 28px;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .step-card:hover { transform: translateY(-6px); border-color: var(--brand-primary); box-shadow: var(--shadow-glow); }
+        .step-num {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800; color: #fff;
+            margin-bottom: 24px;
+            position: relative; z-index: 1;
+        }
+        .step-card h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+        .step-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+
+        /* TRANSPARENCY PREVIEW */
+        .transparency-preview {
             background: var(--bg-primary);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             border-radius: var(--radius-lg);
             overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+        .preview-header {
+            display: flex; align-items: center; gap: 10px;
+            padding: 16px 20px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border);
+        }
+        .preview-header .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .preview-header .dot:nth-child(1) { background: #FF5F57; }
+        .preview-header .dot:nth-child(2) { background: #FFBD2E; }
+        .preview-header .dot:nth-child(3) { background: #28CA41; }
+        .preview-header .title { margin-left: 12px; font-size: 13px; color: var(--text-muted); font-weight: 500; }
+
+        .preview-body { display: grid; grid-template-columns: 1fr 1fr; min-height: 420px; }
+        .preview-panel { padding: 24px; }
+        .preview-panel:first-child { border-right: 1px solid var(--border); }
+        .preview-panel-title {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 20px;
         }
 
-        .widget-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
+        .terminal-line {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 12.5px; line-height: 1.9; color: var(--text-secondary);
         }
+        .terminal-line .prompt { color: var(--brand-secondary); }
+        .terminal-line .cmd { color: var(--text-primary); }
+        .terminal-line .success { color: var(--success); }
+        .terminal-line .info { color: var(--brand-primary); }
+        .terminal-line .warning { color: var(--warning); }
 
-        .widget-header h3 {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        .file-tree { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12.5px; }
+        .file-tree .entry { padding: 4px 0; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
+        .file-tree .entry .icon { width: 16px; text-align: center; }
+        .file-tree .folder { color: var(--brand-primary); }
+        .file-tree .file-new { color: var(--success); }
+        .file-tree .indent { padding-left: 20px; }
+        .file-tree .indent2 { padding-left: 40px; }
 
-        .widget-expand {
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        .widget-menu {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 4px 8px;
-        }
-
-        .widget-content {
-            padding: 16px;
-        }
-
-        /* Traffic Chart */
-        .chart-placeholder {
-            height: 150px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-        }
-
-        .bar-chart {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-around;
-            height: 120px;
-            gap: 8px;
-        }
-
-        .bar-chart .bar {
-            flex: 1;
-            background: var(--accent-blue);
-            border-radius: 4px 4px 0 0;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-
-        .bar-chart .bar:hover {
-            opacity: 1;
-        }
-
-        .bar-chart .bar.highlight {
-            background: var(--accent-orange);
-            opacity: 1;
-        }
-
-        .chart-labels {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 8px;
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        /* Donut Chart */
-        .donut-container {
-            display: flex;
-            align-items: center;
+        /* FEATURES */
+        .features-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
             gap: 20px;
         }
-
-        .donut-chart {
-            width: 100px;
-            height: 100px;
-            flex-shrink: 0;
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px 24px;
+            transition: all 0.3s;
         }
-
-        .donut-chart svg {
-            transform: rotate(-90deg);
+        .feature-card:hover { border-color: var(--brand-primary); transform: translateY(-4px); }
+        .feature-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 18px; font-size: 22px;
         }
+        .feature-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+        .feature-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
 
-        .donut-legend h4 {
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 8px;
+        /* PRICING */
+        .pricing-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 24px; align-items: start;
         }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-        }
-
-        .legend-item .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-
-        /* Resource Usage */
-        .resource-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .resource-item:last-child {
-            border-bottom: none;
-        }
-
-        .resource-label {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .resource-bar {
-            flex: 1;
-            max-width: 120px;
-            height: 6px;
-            background: var(--bg-tertiary);
-            border-radius: 3px;
-            margin: 0 12px;
-            overflow: hidden;
-        }
-
-        .resource-fill {
-            height: 100%;
-            border-radius: 3px;
-            transition: width 0.3s;
-        }
-
-        .resource-fill.blue { background: var(--accent-blue); }
-        .resource-fill.green { background: var(--accent-green); }
-        .resource-fill.orange { background: var(--accent-orange); }
-        .resource-fill.purple { background: var(--accent-purple); }
-
-        .resource-value {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-primary);
-            min-width: 60px;
-            text-align: right;
-        }
-
-        /* Quick Actions */
-        .quick-actions-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-        }
-
-        .action-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
+        .pricing-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: 20px;
+            padding: 40px 32px;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .pricing-card.popular {
+            border-color: var(--brand-primary);
+            box-shadow: var(--shadow-glow);
+            transform: scale(1.03);
+        }
+        .pricing-card .popular-badge {
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            background: var(--brand-primary); color: #fff;
+            padding: 4px 16px; border-radius: 100px;
+            font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .pricing-card .plan-name { font-size: 16px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+        .pricing-card .price { font-size: 48px; font-weight: 800; margin-bottom: 4px; }
+        .pricing-card .price span { font-size: 16px; font-weight: 500; color: var(--text-muted); }
+        .pricing-card .price-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; }
+        .pricing-card ul { list-style: none; margin-bottom: 32px; }
+        .pricing-card li {
+            padding: 8px 0; font-size: 14px; color: var(--text-secondary);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .pricing-card li::before {
+            content: '\2713'; color: var(--success); font-weight: 700; font-size: 14px;
+            width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+            background: rgba(0,212,170,0.1); border-radius: 50%; flex-shrink: 0;
+        }
+        .pricing-card .btn { width: 100%; justify-content: center; }
+
+        /* CTA */
+        .cta-section {
             text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
+            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
         }
-
-        .action-card:hover {
-            border-color: var(--accent-blue);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .action-icon {
-            width: 44px;
-            height: 44px;
-            margin: 0 auto 12px;
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .action-icon svg {
-            width: 22px;
-            height: 22px;
-        }
-
-        .action-card:nth-child(1) .action-icon { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); }
-        .action-card:nth-child(2) .action-icon { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); }
-        .action-card:nth-child(3) .action-icon { background: rgba(99, 102, 241, 0.1); color: var(--accent-purple); }
-        .action-card:nth-child(4) .action-icon { background: rgba(249, 115, 22, 0.1); color: var(--accent-orange); }
-
-        .action-card h4 {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        .action-card p {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        /* Data Table Section */
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-
-        .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .see-all {
-            font-size: 13px;
-            color: var(--accent-blue);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .see-all:hover {
-            text-decoration: underline;
-        }
-
-        .data-table-container {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
+        .cta-box {
+            background: var(--gradient-card);
+            border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            overflow: hidden;
+            padding: 80px 60px;
+            max-width: 800px; margin: 0 auto;
+            position: relative; overflow: hidden;
+        }
+        .cta-box::before {
+            content: '';
+            position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(108,60,225,0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .cta-box h2 { font-size: 36px; font-weight: 800; margin-bottom: 16px; position: relative; }
+        .cta-box p { font-size: 18px; color: var(--text-secondary); margin-bottom: 36px; position: relative; }
+        .cta-box .hero-actions { position: relative; }
+
+        /* FOOTER */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 60px 40px 40px;
+            position: relative; z-index: 1;
+        }
+        .footer-grid {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px; margin-bottom: 48px;
+        }
+        .footer-brand p { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-top: 12px; }
+        .footer-col h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-primary); margin-bottom: 16px; }
+        .footer-col a { display: block; font-size: 14px; color: var(--text-muted); text-decoration: none; padding: 4px 0; transition: color 0.2s; }
+        .footer-col a:hover { color: var(--text-primary); }
+        .footer-bottom {
+            max-width: 1200px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+            padding-top: 24px; border-top: 1px solid var(--border);
+            font-size: 13px; color: var(--text-muted);
         }
 
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .data-table th,
-        .data-table td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .data-table th {
-            background: var(--bg-secondary);
-            font-weight: 500;
-            font-size: 12px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .data-table tbody tr:hover {
-            background: var(--bg-secondary);
-        }
-
-        .data-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .domain-cell {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .domain-favicon {
-            width: 28px;
-            height: 28px;
-            border-radius: var(--radius-sm);
-            background: var(--bg-tertiary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        .domain-name {
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 999px;
-            font-size: 11px;
-            font-weight: 500;
-        }
-
-        .badge-success { background: #dcfce7; color: #166534; }
-        .badge-warning { background: #fef3c7; color: #92400e; }
-        .badge-info { background: #dbeafe; color: #1e40af; }
-
-        .action-btn {
-            background: transparent;
-            border: none;
-            padding: 4px 8px;
-            cursor: pointer;
-            color: var(--text-muted);
-            border-radius: var(--radius-sm);
-        }
-
-        .action-btn:hover {
-            background: var(--bg-secondary);
-        }
-
-        /* Alert Banner */
-        .alert-banner {
-            background: var(--bg-primary);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            border-left: 4px solid var(--accent-yellow);
-            border-radius: var(--radius-lg);
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-        }
-
-        .alert-content {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .alert-icon {
-            width: 36px;
-            height: 36px;
-            background: rgba(245, 158, 11, 0.1);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent-yellow);
-            font-size: 16px;
-        }
-
-        .alert-text h4 {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 2px;
-        }
-
-        .alert-text p {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        /* Responsive */
-        @media (max-width: 1400px) {
-            .stats-row {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .dashboard-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
+        /* RESPONSIVE */
         @media (max-width: 1024px) {
-            .sidebar {
-                width: 60px;
-            }
-            .nav-item span,
-            .nav-section-title,
-            .nav-badge {
-                display: none;
-            }
-            .nav-item {
-                justify-content: center;
-                padding: 12px;
-            }
-            .quick-actions-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            .hero h1 { font-size: 48px; }
+            .steps-grid, .features-grid, .pricing-grid { grid-template-columns: 1fr; }
+            .steps-grid::before { display: none; }
+            .preview-body { grid-template-columns: 1fr; }
+            .preview-panel:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .pricing-card.popular { transform: none; }
         }
-
         @media (max-width: 768px) {
-            .dashboard-grid,
-            .stats-row,
-            .quick-actions-grid {
-                grid-template-columns: 1fr;
-            }
-            .header-left .breadcrumb {
-                display: none;
-            }
-            .search-box {
-                display: none;
-            }
-            .site-header-card {
-                flex-direction: column;
-                text-align: center;
-                gap: 16px;
-            }
-            .site-info {
-                flex-direction: column;
-            }
+            nav { padding: 0 20px; }
+            .nav-links { display: none; }
+            .hero { padding: 120px 20px 60px; }
+            .hero h1 { font-size: 36px; letter-spacing: -1px; }
+            .hero p { font-size: 17px; }
+            .hero-stats { gap: 24px; flex-wrap: wrap; }
+            section { padding: 60px 20px; }
+            .section-title { font-size: 30px; }
+            .platforms-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-grid { grid-template-columns: 1fr; }
+            .arrow-line .line { width: 30px; }
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Header -->
-        <header class="top-header">
-            <div class="header-left">
-                <div class="logo-selector">
-                    <div class="logo-icon">
-                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                        </svg>
-                    </div>
-                    <span class="logo-text">cPanel<span>®</span></span>
-                    <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-                <div class="header-divider"></div>
-                <nav class="breadcrumb">
-                    <button class="nav-btn">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                    <button class="nav-btn">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                    <span class="breadcrumb-current">Dashboard</span>
-                </nav>
-            </div>
-            <div class="header-right">
-                <div class="search-box">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/>
-                        <path d="M11 11L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                    <input type="text" placeholder="Search tools...">
-                    <span class="search-shortcut">⌘K</span>
-                </div>
-                <button class="header-icon-btn">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M10 2.5V4.16667M10 15.8333V17.5M4.10833 4.10833L5.28333 5.28333M14.7167 14.7167L15.8917 15.8917M2.5 10H4.16667M15.8333 10H17.5M4.10833 15.8917L5.28333 14.7167M14.7167 5.28333L15.8917 4.10833" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                </button>
-                <button class="header-icon-btn">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M15 6.66667C15 5.34058 14.4732 4.06881 13.5355 3.13113C12.5979 2.19345 11.3261 1.66667 10 1.66667C8.67392 1.66667 7.40215 2.19345 6.46447 3.13113C5.52678 4.06881 5 5.34058 5 6.66667C5 12.5 2.5 14.1667 2.5 14.1667H17.5C17.5 14.1667 15 12.5 15 6.66667Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M11.4417 17.5C11.2952 17.7526 11.0849 17.9622 10.8319 18.1079C10.5788 18.2537 10.292 18.3304 10 18.3304C9.70802 18.3304 9.42116 18.2537 9.16814 18.1079C8.91513 17.9622 8.70484 17.7526 8.55833 17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span class="notification-dot"></span>
-                </button>
-                <div class="user-profile">
-                    <span class="user-name">Matt Russell</span>
-                    <div class="user-avatar">MR</div>
-                </div>
-            </div>
-        </header>
+    <div class="bg-grid"></div>
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
 
-        <div class="main-layout">
-            <!-- Sidebar -->
-            <aside class="sidebar">
-                <nav class="sidebar-nav">
-                    <a class="nav-item active">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <rect x="2" y="2" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
-                            <rect x="11" y="2" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
-                            <rect x="2" y="11" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
-                            <rect x="11" y="11" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
-                        </svg>
-                        <span>Dashboard</span>
-                    </a>
-
-                    <div class="nav-section">
-                        <span class="nav-section-title">HOSTING</span>
-                        <a class="nav-item">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
-                                <line x1="2" y1="10" x2="18" y2="10" stroke="currentColor" stroke-width="1.5"/>
-                                <path d="M10 2C12 4.5 13 7 13 10C13 13 12 15.5 10 18" stroke="currentColor" stroke-width="1.5"/>
-                                <path d="M10 2C8 4.5 7 7 7 10C7 13 8 15.5 10 18" stroke="currentColor" stroke-width="1.5"/>
-                            </svg>
-                            <span>Domains</span>
-                        </a>
-                        <a class="nav-item">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <path d="M4 4h12c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.5"/>
-                                <polyline points="18,6 10,11 2,6" stroke="currentColor" stroke-width="1.5"/>
-                            </svg>
-                            <span>Email</span>
-                            <span class="nav-badge">3</span>
-                        </a>
-                        <a class="nav-item">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <path d="M18 15a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.5"/>
-                            </svg>
-                            <span>Files</span>
-                        </a>
-                        <a class="nav-item">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <ellipse cx="10" cy="5" rx="8" ry="3" stroke="currentColor" stroke-width="1.5"/>
-                                <path d="M18 10c0 1.66-3.58 3-8 3s-8-1.34-8-3" stroke="currentColor" stroke-width="1.5"/>
-                                <path d="M2 5v10c0 1.66 3.58 3 8 3s8-1.34 8-3V5" stroke="currentColor" stroke-width="1.5"/>
-                            </svg>
-                            <span>Databases</span>
-                        </a>
-                    </div>
-
-                    <div class="nav-section">
-                        <span class="nav-section-title">MANAGE</span>
-                        <a class="nav-item">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <path d="M10 18s6.67-3.33 6.67-8.33V4.17L10 1.67 3.33 4.17v5.5c0 5 6.67 8.33 6.67 8.33z" stroke="currentColor" stroke-width="1.5"/>
-                            </svg>
-                            <span>Security</span>
-                        </a>
-                        <a class="nav-item">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <line x1="15" y1="16.67" x2="15" y2="8.33" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                <line x1="10" y1="16.67" x2="10" y2="3.33" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                <line x1="5" y1="16.67" x2="5" y2="11.67" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                            </svg>
-                            <span>Analytics</span>
-                        </a>
-                        <a class="nav-item">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <path d="M15.83 17.5H4.17c-0.92 0-1.67-0.75-1.67-1.67V4.17c0-0.92 0.75-1.67 1.67-1.67h9.16l4.17 4.17v9.16c0 0.92-0.75 1.67-1.67 1.67z" stroke="currentColor" stroke-width="1.5"/>
-                                <polyline points="14.17,17.5 14.17,10.83 5.83,10.83 5.83,17.5" stroke="currentColor" stroke-width="1.5"/>
-                                <polyline points="5.83,2.5 5.83,6.67 12.5,6.67" stroke="currentColor" stroke-width="1.5"/>
-                            </svg>
-                            <span>Backups</span>
-                        </a>
-                    </div>
-
-                    <div class="nav-section">
-                        <span class="nav-section-title">APPS</span>
-                        <a class="nav-item">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
-                                <path d="M8 10H12M10 8V12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                            </svg>
-                            <span>WordPress</span>
-                            <span class="nav-badge">1</span>
-                        </a>
-                        <a class="nav-item">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>
-                                <path d="M5 9L8 12L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M11 15H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                            </svg>
-                            <span>Terminal</span>
-                        </a>
-                    </div>
-                </nav>
-
-                <div class="sidebar-footer">
-                    <a class="nav-item">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <circle cx="10" cy="10" r="2" stroke="currentColor" stroke-width="1.5"/>
-                            <path d="M10 2V5M10 15V18M2 10H5M15 10H18M4.22 4.22L6.34 6.34M13.66 13.66L15.78 15.78M4.22 15.78L6.34 13.66M13.66 6.34L15.78 4.22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                        </svg>
-                        <span>Settings</span>
-                    </a>
-                    <a class="nav-item">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
-                            <path d="M10 6V10M10 14H10.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                        </svg>
-                        <span>Help</span>
-                    </a>
-                </div>
-            </aside>
-
-            <!-- Main Content -->
-            <main class="main-content">
-                <div class="page-header">
-                    <h1>Dashboard</h1>
-                    <div class="page-actions">
-                        <button class="btn-secondary">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                <path d="M2 10V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                <path d="M8 2V10M8 10L5 7M8 10L11 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            Export
-                        </button>
-                        <button class="btn-primary">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                            </svg>
-                            Add Domain
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Site Header -->
-                <div class="site-header-card">
-                    <div class="site-info">
-                        <div class="site-favicon">LC</div>
-                        <div class="site-details">
-                            <h2>londoncolocation.com</h2>
-                            <div class="site-meta">
-                                <span>
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                        <circle cx="12" cy="10" r="3"/>
-                                    </svg>
-                                    London, UK
-                                </span>
-                                <span>
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                                        <line x1="16" y1="2" x2="16" y2="6"/>
-                                        <line x1="8" y1="2" x2="8" y2="6"/>
-                                        <line x1="3" y1="10" x2="21" y2="10"/>
-                                    </svg>
-                                    Created Jan 2024
-                                </span>
-                                <span>
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                                    </svg>
-                                    SSL Active
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="status-indicator">
-                        <span class="status-dot"></span>
-                        Site Online
-                    </div>
-                </div>
-
-                <!-- Alert Banner -->
-                <div class="alert-banner">
-                    <div class="alert-content">
-                        <div class="alert-icon">⚠️</div>
-                        <div class="alert-text">
-                            <h4>SSL certificate expires in 14 days</h4>
-                            <p>Renew now to keep your site secure</p>
-                        </div>
-                    </div>
-                    <button class="btn-primary">Renew Certificate</button>
-                </div>
-
-                <!-- Stats Row -->
-                <div class="stats-row">
-                    <div class="stat-card">
-                        <div class="stat-icon blue">
-                            <svg viewBox="0 0 20 20" fill="none">
-                                <path d="M17.5 10C17.5 14.1421 14.1421 17.5 10 17.5C5.85786 17.5 2.5 14.1421 2.5 10C2.5 5.85786 5.85786 2.5 10 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                <path d="M10 5V10L13.5 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <div class="stat-info">
-                            <span class="stat-value">24,521</span>
-                            <span class="stat-label">Visitors (30d)</span>
-                            <span class="stat-trend up">↑ 12%</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon green">
-                            <svg viewBox="0 0 20 20" fill="none">
-                                <path d="M10 2V18M6 6L10 2L14 6M6 14L10 18L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <div class="stat-info">
-                            <span class="stat-value">5.6 GB</span>
-                            <span class="stat-label">Bandwidth</span>
-                            <span class="stat-trend up">↑ 8%</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon purple">
-                            <svg viewBox="0 0 20 20" fill="none">
-                                <rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
-                                <path d="M3 8H17" stroke="currentColor" stroke-width="1.5"/>
-                            </svg>
-                        </div>
-                        <div class="stat-info">
-                            <span class="stat-value">2.5 GB</span>
-                            <span class="stat-label">Storage Used</span>
-                            <span class="stat-trend down">↓ 2%</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon orange">
-                            <svg viewBox="0 0 20 20" fill="none">
-                                <path d="M10 18s6.67-3.33 6.67-8.33V4.17L10 1.67 3.33 4.17v5.5c0 5 6.67 8.33 6.67 8.33z" stroke="currentColor" stroke-width="1.5"/>
-                                <path d="M7 10L9 12L13 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <div class="stat-info">
-                            <span class="stat-value">99.9%</span>
-                            <span class="stat-label">Uptime</span>
-                            <span class="stat-trend up">↑ 0.1%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Dashboard Grid -->
-                <div class="dashboard-grid">
-                    <!-- Traffic Widget -->
-                    <div class="widget">
-                        <div class="widget-header">
-                            <h3>Traffic Overview <span class="widget-expand">›</span></h3>
-                            <button class="widget-menu">⋮</button>
-                        </div>
-                        <div class="widget-content">
-                            <div class="chart-placeholder">
-                                <div class="bar-chart">
-                                    <div class="bar" style="height: 45%"></div>
-                                    <div class="bar" style="height: 60%"></div>
-                                    <div class="bar" style="height: 55%"></div>
-                                    <div class="bar" style="height: 75%"></div>
-                                    <div class="bar" style="height: 65%"></div>
-                                    <div class="bar highlight" style="height: 85%"></div>
-                                    <div class="bar" style="height: 70%"></div>
-                                </div>
-                                <div class="chart-labels">
-                                    <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Storage Widget -->
-                    <div class="widget">
-                        <div class="widget-header">
-                            <h3>Storage Breakdown <span class="widget-expand">›</span></h3>
-                            <button class="widget-menu">⋮</button>
-                        </div>
-                        <div class="widget-content">
-                            <div class="donut-container">
-                                <div class="donut-chart">
-                                    <svg viewBox="0 0 100 100">
-                                        <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e7eb" stroke-width="20"/>
-                                        <circle cx="50" cy="50" r="40" fill="none" stroke="#3B82F6" stroke-width="20"
-                                                stroke-dasharray="100 151" stroke-dashoffset="0"/>
-                                        <circle cx="50" cy="50" r="40" fill="none" stroke="#10B981" stroke-width="20"
-                                                stroke-dasharray="50 201" stroke-dashoffset="-100"/>
-                                        <circle cx="50" cy="50" r="40" fill="none" stroke="#F97316" stroke-width="20"
-                                                stroke-dasharray="30 221" stroke-dashoffset="-150"/>
-                                        <circle cx="50" cy="50" r="40" fill="none" stroke="#6366F1" stroke-width="20"
-                                                stroke-dasharray="21 230" stroke-dashoffset="-180"/>
-                                    </svg>
-                                </div>
-                                <div class="donut-legend">
-                                    <h4>2.5 GB of 10 GB</h4>
-                                    <div class="legend-item"><span class="dot" style="background: #3B82F6"></span> WordPress (40%)</div>
-                                    <div class="legend-item"><span class="dot" style="background: #10B981"></span> Emails (20%)</div>
-                                    <div class="legend-item"><span class="dot" style="background: #F97316"></span> Databases (12%)</div>
-                                    <div class="legend-item"><span class="dot" style="background: #6366F1"></span> Other (8%)</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Resources Widget -->
-                    <div class="widget">
-                        <div class="widget-header">
-                            <h3>Resource Usage <span class="widget-expand">›</span></h3>
-                            <button class="widget-menu">⋮</button>
-                        </div>
-                        <div class="widget-content">
-                            <div class="resource-item">
-                                <span class="resource-label">CPU</span>
-                                <div class="resource-bar">
-                                    <div class="resource-fill blue" style="width: 35%"></div>
-                                </div>
-                                <span class="resource-value">35%</span>
-                            </div>
-                            <div class="resource-item">
-                                <span class="resource-label">Memory</span>
-                                <div class="resource-bar">
-                                    <div class="resource-fill green" style="width: 62%"></div>
-                                </div>
-                                <span class="resource-value">62%</span>
-                            </div>
-                            <div class="resource-item">
-                                <span class="resource-label">I/O</span>
-                                <div class="resource-bar">
-                                    <div class="resource-fill orange" style="width: 18%"></div>
-                                </div>
-                                <span class="resource-value">18%</span>
-                            </div>
-                            <div class="resource-item">
-                                <span class="resource-label">Processes</span>
-                                <div class="resource-bar">
-                                    <div class="resource-fill purple" style="width: 45%"></div>
-                                </div>
-                                <span class="resource-value">45/100</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Quick Actions -->
-                <div class="section-header">
-                    <h2 class="section-title">Quick Actions</h2>
-                    <a href="#" class="see-all">See all tools →</a>
-                </div>
-                <div class="quick-actions-grid">
-                    <div class="action-card">
-                        <div class="action-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-                            </svg>
-                        </div>
-                        <h4>File Manager</h4>
-                        <p>Browse & edit files</p>
-                    </div>
-                    <div class="action-card">
-                        <div class="action-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                                <polyline points="22,6 12,13 2,6"/>
-                            </svg>
-                        </div>
-                        <h4>Email Accounts</h4>
-                        <p>Create & manage</p>
-                    </div>
-                    <div class="action-card">
-                        <div class="action-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <ellipse cx="12" cy="5" rx="9" ry="3"/>
-                                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
-                                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
-                            </svg>
-                        </div>
-                        <h4>Databases</h4>
-                        <p>MySQL & phpMyAdmin</p>
-                    </div>
-                    <div class="action-card">
-                        <div class="action-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                                <polyline points="17 21 17 13 7 13 7 21"/>
-                                <polyline points="7 3 7 8 15 8"/>
-                            </svg>
-                        </div>
-                        <h4>Backup</h4>
-                        <p>Download backup</p>
-                    </div>
-                </div>
-
-                <!-- Recent Domains Table -->
-                <div class="section-header" style="margin-top: 24px;">
-                    <h2 class="section-title">Addon Domains</h2>
-                    <a href="#" class="see-all">Manage domains →</a>
-                </div>
-                <div class="data-table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Domain</th>
-                                <th>Status</th>
-                                <th>SSL</th>
-                                <th>Document Root</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="domain-cell">
-                                        <div class="domain-favicon">LC</div>
-                                        <span class="domain-name">londoncolocation.com</span>
-                                    </div>
-                                </td>
-                                <td><span class="badge badge-success">Active</span></td>
-                                <td><span class="badge badge-success">Valid</span></td>
-                                <td>/public_html</td>
-                                <td>
-                                    <button class="action-btn">
-                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                            <circle cx="8" cy="3" r="1" fill="currentColor"/>
-                                            <circle cx="8" cy="8" r="1" fill="currentColor"/>
-                                            <circle cx="8" cy="13" r="1" fill="currentColor"/>
-                                        </svg>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="domain-cell">
-                                        <div class="domain-favicon">BL</div>
-                                        <span class="domain-name">blog.londoncolocation.com</span>
-                                    </div>
-                                </td>
-                                <td><span class="badge badge-success">Active</span></td>
-                                <td><span class="badge badge-success">Valid</span></td>
-                                <td>/public_html/blog</td>
-                                <td>
-                                    <button class="action-btn">
-                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                            <circle cx="8" cy="3" r="1" fill="currentColor"/>
-                                            <circle cx="8" cy="8" r="1" fill="currentColor"/>
-                                            <circle cx="8" cy="13" r="1" fill="currentColor"/>
-                                        </svg>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="domain-cell">
-                                        <div class="domain-favicon">ST</div>
-                                        <span class="domain-name">staging.londoncolocation.com</span>
-                                    </div>
-                                </td>
-                                <td><span class="badge badge-warning">Paused</span></td>
-                                <td><span class="badge badge-info">Pending</span></td>
-                                <td>/public_html/staging</td>
-                                <td>
-                                    <button class="action-btn">
-                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                            <circle cx="8" cy="3" r="1" fill="currentColor"/>
-                                            <circle cx="8" cy="8" r="1" fill="currentColor"/>
-                                            <circle cx="8" cy="13" r="1" fill="currentColor"/>
-                                        </svg>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </main>
+    <!-- NAV -->
+    <nav>
+        <a href="index.html" class="nav-brand">
+            <div class="logo-icon">S</div>
+            SiteMove
+        </a>
+        <div class="nav-links">
+            <a href="#how-it-works">How It Works</a>
+            <a href="#platforms">Platforms</a>
+            <a href="#features">Features</a>
+            <a href="#pricing">Pricing</a>
+            <a href="dashboard.html">Dashboard</a>
         </div>
-    </div>
+        <div class="nav-actions">
+            <a href="dashboard.html" class="btn btn-ghost">Log In</a>
+            <a href="migrate.html" class="btn btn-primary">Start Migration</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-badge">
+            <span class="dot"></span>
+            AI-powered migration engine now live
+        </div>
+        <h1>
+            Move your site to<br>
+            <span class="gradient-text">WordPress &amp; cPanel</span>
+        </h1>
+        <p>
+            AI-powered migration from Lovable, Cursor, Bolt, and other platforms.
+            Watch every step as your site is intelligently re-created and deployed.
+        </p>
+        <div class="hero-actions">
+            <a href="migrate.html" class="btn btn-primary btn-large">Start Free Migration</a>
+            <a href="#how-it-works" class="btn btn-secondary btn-large">See How It Works</a>
+        </div>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="num">2,400+</div>
+                <div class="label">Sites Migrated</div>
+            </div>
+            <div class="hero-stat">
+                <div class="num">99.2%</div>
+                <div class="label">Success Rate</div>
+            </div>
+            <div class="hero-stat">
+                <div class="num">&lt;5min</div>
+                <div class="label">Average Migration</div>
+            </div>
+            <div class="hero-stat">
+                <div class="num">100%</div>
+                <div class="label">Transparent Process</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PLATFORMS -->
+    <section id="platforms">
+        <div class="section-container">
+            <div class="section-label">Supported Platforms</div>
+            <h2 class="section-title">From anywhere, to everywhere</h2>
+            <p class="section-subtitle">Migrate from any AI-generated site builder to production-ready hosting.</p>
+
+            <h3 style="font-size: 14px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;">Source Platforms</h3>
+            <div class="platforms-grid">
+                <div class="platform-card">
+                    <div class="platform-icon" style="background: linear-gradient(135deg, #FF6B6B, #EE5A24);">L</div>
+                    <div class="name">Lovable</div>
+                    <div class="type">AI Builder</div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-icon" style="background: linear-gradient(135deg, #4A90D9, #357ABD);">C</div>
+                    <div class="name">Cursor</div>
+                    <div class="type">AI IDE</div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-icon" style="background: linear-gradient(135deg, #F5A623, #E8961C);">B</div>
+                    <div class="name">Bolt.new</div>
+                    <div class="type">AI Builder</div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-icon" style="background: linear-gradient(135deg, #000, #333);">v0</div>
+                    <div class="name">Vercel v0</div>
+                    <div class="type">AI Generator</div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-icon" style="background: linear-gradient(135deg, #7C3AED, #5B21B6);">R</div>
+                    <div class="name">Replit</div>
+                    <div class="type">AI IDE</div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-icon" style="background: linear-gradient(135deg, #10B981, #059669);">+</div>
+                    <div class="name">Any URL</div>
+                    <div class="type">Custom Source</div>
+                </div>
+            </div>
+
+            <div class="platform-arrow">
+                <div class="arrow-line">
+                    <div class="line"></div>
+                    <div class="ai-badge">AI Engine</div>
+                    <div class="line"></div>
+                </div>
+            </div>
+
+            <h3 style="font-size: 14px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;">Destination Platforms</h3>
+            <div class="dest-grid">
+                <div class="dest-card">
+                    <div class="icon">&#9881;</div>
+                    <div class="name">WordPress</div>
+                    <div class="desc">Full WordPress theme with customizer support, responsive design, and WP best practices.</div>
+                </div>
+                <div class="dest-card">
+                    <div class="icon">&#9879;</div>
+                    <div class="name">cPanel Static</div>
+                    <div class="desc">Optimized static site deployed directly to cPanel with full file manager access.</div>
+                </div>
+                <div class="dest-card">
+                    <div class="icon">&#9889;</div>
+                    <div class="name">cPanel + Node.js</div>
+                    <div class="desc">Full-stack Vercel-style app on cPanel with Node.js, SSR support, and API routes.</div>
+                </div>
+                <div class="dest-card">
+                    <div class="icon">&#128640;</div>
+                    <div class="name">cPanel + Docker</div>
+                    <div class="desc">Containerized deployment on cPanel for complex applications and microservices.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how-it-works" style="background: var(--bg-secondary);">
+        <div class="section-container">
+            <div class="section-label">How It Works</div>
+            <h2 class="section-title">Three steps. Full transparency.</h2>
+            <p class="section-subtitle">Watch AI analyze, convert, and deploy your site in real-time.</p>
+
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-num">1</div>
+                    <h3>Paste Your URL</h3>
+                    <p>Enter the URL of your AI-generated site from Lovable, Cursor, Bolt, or any other platform. Our engine detects the framework and structure automatically.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">2</div>
+                    <h3>AI Analyzes &amp; Converts</h3>
+                    <p>Watch in real-time as AI scans your site, extracts components, assets, and styles, then intelligently re-creates everything for your chosen destination platform.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">3</div>
+                    <h3>Deploy &amp; Go Live</h3>
+                    <p>Your migrated site is deployed to WordPress or cPanel with a single click. Full file access, custom domain support, and production-ready optimization included.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRANSPARENCY PREVIEW -->
+    <section style="background: var(--bg-primary);">
+        <div class="section-container">
+            <div class="section-label">Full Transparency</div>
+            <h2 class="section-title">Watch the AI work</h2>
+            <p class="section-subtitle">No black boxes. See every decision the AI makes as it re-creates your site.</p>
+
+            <div class="transparency-preview">
+                <div class="preview-header">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="title">SiteMove AI Engine &mdash; Migration in Progress</span>
+                </div>
+                <div class="preview-body">
+                    <div class="preview-panel">
+                        <div class="preview-panel-title">AI Processing Log</div>
+                        <div class="terminal-line"><span class="prompt">$</span> <span class="cmd">Scanning source: portfolio.lovable.app</span></div>
+                        <div class="terminal-line"><span class="success">&#10003;</span> Detected framework: React + Vite</div>
+                        <div class="terminal-line"><span class="success">&#10003;</span> Found 12 components, 3 pages, 24 assets</div>
+                        <div class="terminal-line"><span class="info">&#9679;</span> Extracting navigation structure...</div>
+                        <div class="terminal-line"><span class="success">&#10003;</span> Nav: Home, About, Projects, Contact</div>
+                        <div class="terminal-line"><span class="info">&#9679;</span> Converting Hero component to WordPress block</div>
+                        <div class="terminal-line"><span class="success">&#10003;</span> Generated header.php with responsive nav</div>
+                        <div class="terminal-line"><span class="info">&#9679;</span> Extracting color palette: #6C3CE1, #00D4AA</div>
+                        <div class="terminal-line"><span class="success">&#10003;</span> Generated style.css with CSS custom properties</div>
+                        <div class="terminal-line"><span class="info">&#9679;</span> Converting 24 images to WebP format...</div>
+                        <div class="terminal-line"><span class="success">&#10003;</span> Optimized: 4.2MB &#8594; 1.1MB (74% reduction)</div>
+                        <div class="terminal-line"><span class="warning">&#9679;</span> Font substitution: Inter &#8594; Inter (CDN)</div>
+                        <div class="terminal-line"><span class="success">&#10003;</span> WordPress theme package ready</div>
+                        <div class="terminal-line"><span class="prompt">$</span> <span class="cmd">Deploying to cPanel...</span></div>
+                        <div class="terminal-line"><span class="success">&#10003;</span> <span class="cmd">Migration complete!</span></div>
+                    </div>
+                    <div class="preview-panel">
+                        <div class="preview-panel-title">Generated File Structure</div>
+                        <div class="file-tree">
+                            <div class="entry folder"><span class="icon">&#128193;</span> wp-content/themes/portfolio/</div>
+                            <div class="entry file-new indent"><span class="icon">&#128196;</span> style.css</div>
+                            <div class="entry file-new indent"><span class="icon">&#128196;</span> functions.php</div>
+                            <div class="entry file-new indent"><span class="icon">&#128196;</span> header.php</div>
+                            <div class="entry file-new indent"><span class="icon">&#128196;</span> footer.php</div>
+                            <div class="entry file-new indent"><span class="icon">&#128196;</span> index.php</div>
+                            <div class="entry file-new indent"><span class="icon">&#128196;</span> page-about.php</div>
+                            <div class="entry file-new indent"><span class="icon">&#128196;</span> page-projects.php</div>
+                            <div class="entry file-new indent"><span class="icon">&#128196;</span> page-contact.php</div>
+                            <div class="entry folder indent"><span class="icon">&#128193;</span> assets/</div>
+                            <div class="entry file-new indent2"><span class="icon">&#128196;</span> main.js</div>
+                            <div class="entry file-new indent2"><span class="icon">&#128196;</span> responsive.css</div>
+                            <div class="entry folder indent"><span class="icon">&#128193;</span> images/</div>
+                            <div class="entry file-new indent2"><span class="icon">&#128248;</span> hero-bg.webp</div>
+                            <div class="entry file-new indent2"><span class="icon">&#128248;</span> project-1.webp</div>
+                            <div class="entry file-new indent2"><span class="icon">&#128248;</span> project-2.webp</div>
+                            <div class="entry file-new indent2"><span class="icon">&#128248;</span> avatar.webp</div>
+                            <div class="entry folder"><span class="icon">&#128193;</span> screenshot.png</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features">
+        <div class="section-container">
+            <div class="section-label">Features</div>
+            <h2 class="section-title">Built for modern migrations</h2>
+            <p class="section-subtitle">Everything you need to move AI-generated sites to production hosting.</p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: rgba(108,60,225,0.15);">&#129302;</div>
+                    <h3>AI-Powered Conversion</h3>
+                    <p>Our AI engine understands React, Vue, Svelte, and static HTML. It intelligently converts components to WordPress templates or optimized static files.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: rgba(0,212,170,0.15);">&#128065;</div>
+                    <h3>Full Transparency</h3>
+                    <p>Watch every step of the migration in real-time. See AI decisions, file generation, and optimization happening live. No black boxes.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: rgba(255,107,53,0.15);">&#9889;</div>
+                    <h3>One-Click Deploy</h3>
+                    <p>Deploy directly to your cPanel hosting or WordPress installation. Automatic domain configuration and SSL setup included.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: rgba(255,184,0,0.15);">&#128230;</div>
+                    <h3>Asset Optimization</h3>
+                    <p>Images converted to WebP, CSS minified, JavaScript bundled. Your migrated site loads faster than the original.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: rgba(99,102,241,0.15);">&#128268;</div>
+                    <h3>Framework Detection</h3>
+                    <p>Automatically detects React, Next.js, Vue, Svelte, Astro, and static HTML. Tailored conversion strategies for each framework.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: rgba(236,72,153,0.15);">&#128274;</div>
+                    <h3>Secure Migration</h3>
+                    <p>End-to-end encrypted transfers. Source sites are scanned in isolated environments. All data is purged after migration.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="pricing" style="background: var(--bg-secondary);">
+        <div class="section-container">
+            <div class="section-label">Pricing</div>
+            <h2 class="section-title">Simple, transparent pricing</h2>
+            <p class="section-subtitle">Start with a free migration. Scale when you're ready.</p>
+
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="plan-name">Starter</div>
+                    <div class="price">Free</div>
+                    <div class="price-desc">1 migration included</div>
+                    <ul>
+                        <li>Single page sites</li>
+                        <li>Static HTML output</li>
+                        <li>Basic asset optimization</li>
+                        <li>Community support</li>
+                        <li>7-day file retention</li>
+                    </ul>
+                    <a href="migrate.html" class="btn btn-secondary">Start Free</a>
+                </div>
+                <div class="pricing-card popular">
+                    <div class="popular-badge">Most Popular</div>
+                    <div class="plan-name">Pro</div>
+                    <div class="price">$29 <span>/ migration</span></div>
+                    <div class="price-desc">Pay per migration</div>
+                    <ul>
+                        <li>Multi-page sites (up to 20)</li>
+                        <li>WordPress theme output</li>
+                        <li>cPanel auto-deployment</li>
+                        <li>Advanced image optimization</li>
+                        <li>Priority support</li>
+                        <li>30-day file retention</li>
+                    </ul>
+                    <a href="migrate.html" class="btn btn-primary">Get Started</a>
+                </div>
+                <div class="pricing-card">
+                    <div class="plan-name">Agency</div>
+                    <div class="price">$199 <span>/ month</span></div>
+                    <div class="price-desc">Unlimited migrations</div>
+                    <ul>
+                        <li>Unlimited pages &amp; sites</li>
+                        <li>All output formats</li>
+                        <li>Custom domain auto-config</li>
+                        <li>API access</li>
+                        <li>White-label option</li>
+                        <li>Dedicated support</li>
+                        <li>90-day file retention</li>
+                    </ul>
+                    <a href="migrate.html" class="btn btn-secondary">Contact Sales</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="section-container">
+            <div class="cta-box">
+                <h2>Ready to move your site?</h2>
+                <p>Paste your URL and watch AI handle the rest. Your first migration is free.</p>
+                <div class="hero-actions">
+                    <a href="migrate.html" class="btn btn-primary btn-large">Start Free Migration</a>
+                    <a href="#how-it-works" class="btn btn-secondary btn-large">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="index.html" class="nav-brand">
+                    <div class="logo-icon">S</div>
+                    SiteMove
+                </a>
+                <p>AI-powered website migration platform. Move your AI-generated sites to WordPress and cPanel with full transparency.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Product</h4>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="migrate.html">Start Migration</a>
+            </div>
+            <div class="footer-col">
+                <h4>Platforms</h4>
+                <a href="#">Lovable</a>
+                <a href="#">Cursor</a>
+                <a href="#">Bolt.new</a>
+                <a href="#">Vercel v0</a>
+                <a href="#">Replit</a>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <a href="#">About</a>
+                <a href="#">Blog</a>
+                <a href="#">Documentation</a>
+                <a href="#">Support</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2026 SiteMove. All rights reserved.</span>
+            <span>Built with AI, deployed with confidence.</span>
+        </div>
+    </footer>
 </body>
 </html>

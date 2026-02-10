@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteMove - Migrate Your Site</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --brand-primary: #6C3CE1;
+            --brand-secondary: #00D4AA;
+            --brand-accent: #FF6B35;
+            --bg-primary: #0A0A0F;
+            --bg-secondary: #12121A;
+            --bg-tertiary: #1A1A26;
+            --bg-card: #16161F;
+            --bg-card-hover: #1E1E2A;
+            --text-primary: #F0F0F5;
+            --text-secondary: #9494A8;
+            --text-muted: #5E5E72;
+            --border: #2A2A3A;
+            --border-light: #3A3A4E;
+            --success: #00D4AA;
+            --warning: #FFB800;
+            --error: #FF4757;
+            --gradient-hero: linear-gradient(135deg, #6C3CE1 0%, #00D4AA 50%, #FF6B35 100%);
+            --shadow-lg: 0 25px 50px rgba(0,0,0,0.5);
+            --shadow-glow: 0 0 40px rgba(108,60,225,0.3);
+            --radius: 12px;
+            --radius-lg: 20px;
+            --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        .bg-grid {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(rgba(108,60,225,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(108,60,225,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none; z-index: 0;
+        }
+
+        /* NAV */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: rgba(10,10,15,0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px; height: 64px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-brand {
+            display: flex; align-items: center; gap: 10px;
+            font-weight: 800; font-size: 20px; text-decoration: none; color: var(--text-primary);
+        }
+        .nav-brand .logo-icon {
+            width: 32px; height: 32px;
+            background: var(--gradient-hero);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 900; color: #fff;
+        }
+        .nav-step-indicator {
+            display: flex; align-items: center; gap: 8px;
+        }
+        .nav-step {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; color: var(--text-muted);
+        }
+        .nav-step.active { color: var(--text-primary); }
+        .nav-step.completed { color: var(--success); }
+        .nav-step .num {
+            width: 24px; height: 24px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700;
+            border: 2px solid var(--border);
+            background: transparent;
+        }
+        .nav-step.active .num { border-color: var(--brand-primary); background: var(--brand-primary); color: #fff; }
+        .nav-step.completed .num { border-color: var(--success); background: var(--success); color: #fff; }
+        .nav-step .sep { width: 32px; height: 2px; background: var(--border); margin: 0 4px; }
+        .nav-step.completed .sep { background: var(--success); }
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 22px; border-radius: 10px; font-size: 14px; font-weight: 600;
+            text-decoration: none; cursor: pointer; border: none;
+            transition: all 0.2s ease;
+        }
+        .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+        .btn-ghost:hover { color: var(--text-primary); border-color: var(--border-light); }
+        .btn-primary { background: var(--brand-primary); color: #fff; box-shadow: 0 4px 15px rgba(108,60,225,0.4); }
+        .btn-primary:hover { background: #7B4FE8; transform: translateY(-1px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: transparent; color: var(--text-primary); border: 1px solid var(--border-light); }
+        .btn-secondary:hover { background: var(--bg-tertiary); }
+        .btn-success { background: var(--success); color: #0A0A0F; font-weight: 700; }
+        .btn-success:hover { background: #00E8BB; }
+        .btn-large { padding: 14px 32px; font-size: 16px; border-radius: 12px; }
+
+        /* MAIN CONTENT */
+        .migrate-container {
+            position: relative; z-index: 1;
+            max-width: 880px; margin: 0 auto;
+            padding: 104px 40px 60px;
+        }
+
+        /* STEP PANELS */
+        .step-panel { display: none; animation: fadeIn 0.4s ease; }
+        .step-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        .step-header { margin-bottom: 40px; }
+        .step-header h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+        .step-header p { font-size: 16px; color: var(--text-secondary); }
+
+        /* FORM ELEMENTS */
+        .form-group { margin-bottom: 28px; }
+        .form-label {
+            display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary);
+            margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .form-input {
+            width: 100%; padding: 14px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-family: var(--mono);
+            font-size: 15px;
+            transition: all 0.2s;
+            outline: none;
+        }
+        .form-input:focus { border-color: var(--brand-primary); box-shadow: 0 0 0 3px rgba(108,60,225,0.15); }
+        .form-input::placeholder { color: var(--text-muted); }
+        .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+
+        /* URL INPUT WITH DETECTION */
+        .url-input-wrapper { position: relative; }
+        .url-input-wrapper .form-input { padding-right: 140px; }
+        .url-detect-badge {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            padding: 5px 12px; border-radius: 8px;
+            font-size: 12px; font-weight: 600;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            transition: all 0.3s;
+        }
+        .url-detect-badge.detected {
+            background: rgba(0,212,170,0.1);
+            border-color: rgba(0,212,170,0.3);
+            color: var(--success);
+        }
+
+        /* OPTION CARDS */
+        .option-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .option-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .option-card:hover { border-color: var(--border-light); background: var(--bg-card-hover); }
+        .option-card.selected { border-color: var(--brand-primary); box-shadow: 0 0 30px rgba(108,60,225,0.2); }
+        .option-card .check {
+            position: absolute; top: 16px; right: 16px;
+            width: 24px; height: 24px; border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; color: transparent; transition: all 0.2s;
+        }
+        .option-card.selected .check {
+            border-color: var(--brand-primary); background: var(--brand-primary); color: #fff;
+        }
+        .option-card .option-icon { font-size: 32px; margin-bottom: 14px; }
+        .option-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+        .option-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+        .option-card .tag {
+            display: inline-block; margin-top: 10px; padding: 3px 10px;
+            border-radius: 100px; font-size: 11px; font-weight: 600;
+            background: rgba(108,60,225,0.1); color: var(--brand-primary);
+            border: 1px solid rgba(108,60,225,0.2);
+        }
+        .option-card .tag.popular { background: rgba(0,212,170,0.1); color: var(--success); border-color: rgba(0,212,170,0.2); }
+
+        /* SCAN RESULTS */
+        .scan-results {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px; margin-top: 24px;
+            display: none;
+        }
+        .scan-results.visible { display: block; animation: fadeIn 0.4s ease; }
+        .scan-results h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+        .scan-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .scan-stat {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+        .scan-stat .val { font-size: 24px; font-weight: 800; color: var(--brand-secondary); }
+        .scan-stat .lbl { font-size: 11px; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* STEP ACTIONS */
+        .step-actions {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 40px; padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ====== STEP 3: AI PROCESSING VIEW ====== */
+        .ai-processing-container {
+            display: grid; grid-template-columns: 1fr 360px;
+            gap: 20px; min-height: 520px;
+        }
+
+        /* Terminal Panel */
+        .terminal-panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        .terminal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border);
+        }
+        .terminal-dots { display: flex; gap: 8px; }
+        .terminal-dots span { width: 12px; height: 12px; border-radius: 50%; }
+        .terminal-dots span:nth-child(1) { background: #FF5F57; }
+        .terminal-dots span:nth-child(2) { background: #FFBD2E; }
+        .terminal-dots span:nth-child(3) { background: #28CA41; }
+        .terminal-title { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        .terminal-body {
+            flex: 1; padding: 16px;
+            font-family: var(--mono);
+            font-size: 12.5px; line-height: 1.8;
+            overflow-y: auto; max-height: 480px;
+        }
+        .terminal-body::-webkit-scrollbar { width: 6px; }
+        .terminal-body::-webkit-scrollbar-track { background: transparent; }
+        .terminal-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        .log-line { padding: 1px 0; white-space: pre-wrap; word-break: break-all; }
+        .log-line .ts { color: var(--text-muted); margin-right: 8px; font-size: 11px; }
+        .log-line.cmd { color: var(--brand-secondary); }
+        .log-line.info { color: var(--text-secondary); }
+        .log-line.success { color: var(--success); }
+        .log-line.warn { color: var(--warning); }
+        .log-line.error { color: var(--error); }
+        .log-line.highlight { color: var(--text-primary); font-weight: 600; }
+        .log-line .spinner {
+            display: inline-block; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Side Panel */
+        .side-panel { display: flex; flex-direction: column; gap: 16px; }
+
+        /* Progress Card */
+        .progress-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+        }
+        .progress-card h3 {
+            font-size: 13px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--text-muted); margin-bottom: 16px;
+        }
+        .progress-phase {
+            display: flex; align-items: center; gap: 12px;
+            padding: 8px 0;
+        }
+        .progress-phase .icon {
+            width: 28px; height: 28px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+        .progress-phase.active .icon { background: rgba(108,60,225,0.15); border-color: var(--brand-primary); color: var(--brand-primary); }
+        .progress-phase.done .icon { background: rgba(0,212,170,0.15); border-color: var(--success); color: var(--success); }
+        .progress-phase .phase-info { flex: 1; }
+        .progress-phase .phase-name { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+        .progress-phase.active .phase-name { color: var(--text-primary); }
+        .progress-phase.done .phase-name { color: var(--success); }
+        .progress-phase .phase-detail { font-size: 11px; color: var(--text-muted); }
+
+        .overall-progress { margin-top: 16px; }
+        .progress-bar-bg {
+            width: 100%; height: 6px; border-radius: 3px;
+            background: var(--bg-tertiary);
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%; border-radius: 3px;
+            background: var(--gradient-hero);
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+        .progress-pct {
+            display: flex; justify-content: space-between;
+            font-size: 12px; color: var(--text-muted); margin-top: 6px;
+        }
+
+        /* File Tree Card */
+        .file-tree-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .file-tree-card h3 {
+            font-size: 13px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px;
+        }
+        .file-entry {
+            display: flex; align-items: center; gap: 8px;
+            padding: 3px 0;
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-secondary);
+            animation: fadeIn 0.3s ease;
+        }
+        .file-entry .f-icon { width: 16px; text-align: center; flex-shrink: 0; }
+        .file-entry.folder .f-icon { color: var(--brand-primary); }
+        .file-entry.file .f-icon { color: var(--success); }
+        .file-entry .indent-1 { padding-left: 16px; }
+        .file-entry .indent-2 { padding-left: 32px; }
+        .file-entry .size {
+            margin-left: auto; font-size: 10px; color: var(--text-muted);
+        }
+
+        /* ====== STEP 4: COMPLETION ====== */
+        .completion-container { text-align: center; padding: 40px 0; }
+        .completion-icon {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: rgba(0,212,170,0.15);
+            border: 2px solid var(--success);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 36px;
+            animation: scaleIn 0.5s ease;
+        }
+        @keyframes scaleIn { from { transform: scale(0); } to { transform: scale(1); } }
+        .completion-container h1 { font-size: 36px; font-weight: 800; margin-bottom: 8px; }
+        .completion-container p { font-size: 16px; color: var(--text-secondary); margin-bottom: 32px; }
+
+        .completion-stats {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 16px; margin-bottom: 40px;
+        }
+        .comp-stat {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+        .comp-stat .val { font-size: 28px; font-weight: 800; }
+        .comp-stat .lbl { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+        .completion-actions { display: flex; gap: 16px; justify-content: center; margin-bottom: 40px; }
+
+        .completion-details {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            text-align: left;
+        }
+        .completion-details h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+        .detail-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-row .label { color: var(--text-secondary); }
+        .detail-row .value { color: var(--text-primary); font-weight: 600; font-family: var(--mono); font-size: 13px; }
+        .detail-row .status-badge {
+            padding: 3px 10px; border-radius: 100px; font-size: 12px; font-weight: 600;
+        }
+        .status-badge.live { background: rgba(0,212,170,0.1); color: var(--success); }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .ai-processing-container { grid-template-columns: 1fr; }
+            .option-grid { grid-template-columns: 1fr; }
+            .scan-grid { grid-template-columns: repeat(2, 1fr); }
+            .completion-stats { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            nav { padding: 0 16px; }
+            .nav-step .label { display: none; }
+            .migrate-container { padding: 84px 16px 40px; }
+            .step-header h1 { font-size: 26px; }
+            .completion-actions { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+
+    <!-- NAV -->
+    <nav>
+        <a href="index.html" class="nav-brand">
+            <div class="logo-icon">S</div>
+            SiteMove
+        </a>
+        <div class="nav-step-indicator">
+            <div class="nav-step active" id="nav-step-1">
+                <span class="num">1</span>
+                <span class="label">Source</span>
+            </div>
+            <span class="sep" style="width:32px;height:2px;background:var(--border);display:inline-block;vertical-align:middle;margin:0 6px;"></span>
+            <div class="nav-step" id="nav-step-2">
+                <span class="num">2</span>
+                <span class="label">Destination</span>
+            </div>
+            <span class="sep" style="width:32px;height:2px;background:var(--border);display:inline-block;vertical-align:middle;margin:0 6px;"></span>
+            <div class="nav-step" id="nav-step-3">
+                <span class="num">3</span>
+                <span class="label">Migration</span>
+            </div>
+            <span class="sep" style="width:32px;height:2px;background:var(--border);display:inline-block;vertical-align:middle;margin:0 6px;"></span>
+            <div class="nav-step" id="nav-step-4">
+                <span class="num">4</span>
+                <span class="label">Complete</span>
+            </div>
+        </div>
+        <a href="dashboard.html" class="btn btn-ghost" style="font-size:13px;padding:8px 16px;">Dashboard</a>
+    </nav>
+
+    <div class="migrate-container">
+
+        <!-- ======= STEP 1: SOURCE ======= -->
+        <div class="step-panel active" id="step-1">
+            <div class="step-header">
+                <h1>Where is your site?</h1>
+                <p>Enter the URL of the site you want to migrate. We'll auto-detect the platform and framework.</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Source URL</label>
+                <div class="url-input-wrapper">
+                    <input type="url" id="source-url" class="form-input" placeholder="https://my-project.lovable.app" autocomplete="off">
+                    <div class="url-detect-badge" id="platform-badge">Waiting...</div>
+                </div>
+                <div class="form-hint">Supported: Lovable, Cursor, Bolt.new, Vercel v0, Replit, or any public URL</div>
+            </div>
+
+            <div class="scan-results" id="scan-results">
+                <h3>Site Analysis</h3>
+                <div class="scan-grid">
+                    <div class="scan-stat">
+                        <div class="val" id="scan-pages">-</div>
+                        <div class="lbl">Pages</div>
+                    </div>
+                    <div class="scan-stat">
+                        <div class="val" id="scan-components">-</div>
+                        <div class="lbl">Components</div>
+                    </div>
+                    <div class="scan-stat">
+                        <div class="val" id="scan-assets">-</div>
+                        <div class="lbl">Assets</div>
+                    </div>
+                    <div class="scan-stat">
+                        <div class="val" id="scan-size">-</div>
+                        <div class="lbl">Total Size</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-actions">
+                <a href="index.html" class="btn btn-ghost">Cancel</a>
+                <button class="btn btn-primary" id="btn-step1-next" disabled>Scan &amp; Continue</button>
+            </div>
+        </div>
+
+        <!-- ======= STEP 2: DESTINATION ======= -->
+        <div class="step-panel" id="step-2">
+            <div class="step-header">
+                <h1>Where should it go?</h1>
+                <p>Choose your destination platform. AI will handle the conversion automatically.</p>
+            </div>
+
+            <div class="option-grid" id="dest-options">
+                <div class="option-card" data-dest="wordpress">
+                    <div class="check">&#10003;</div>
+                    <div class="option-icon">&#9881;</div>
+                    <h3>WordPress Theme</h3>
+                    <p>Full WordPress theme with template files, functions.php, customizer support, and responsive design.</p>
+                    <span class="tag popular">Most Popular</span>
+                </div>
+                <div class="option-card" data-dest="cpanel-static">
+                    <div class="check">&#10003;</div>
+                    <div class="option-icon">&#9879;</div>
+                    <h3>cPanel Static Site</h3>
+                    <p>Optimized HTML/CSS/JS deployed to cPanel public_html. Lightning fast, zero dependencies.</p>
+                    <span class="tag">Fastest</span>
+                </div>
+                <div class="option-card" data-dest="cpanel-node">
+                    <div class="check">&#10003;</div>
+                    <div class="option-icon">&#9889;</div>
+                    <h3>cPanel + Node.js</h3>
+                    <p>Full-stack app with Express/Node.js on cPanel. SSR support, API routes, and dynamic content.</p>
+                    <span class="tag">Full Stack</span>
+                </div>
+                <div class="option-card" data-dest="cpanel-docker">
+                    <div class="check">&#10003;</div>
+                    <div class="option-icon">&#128640;</div>
+                    <h3>cPanel + Docker</h3>
+                    <p>Containerized deployment for complex apps. Includes Dockerfile, compose config, and orchestration.</p>
+                    <span class="tag">Advanced</span>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 28px;">
+                <label class="form-label">Custom Domain (optional)</label>
+                <input type="text" id="custom-domain" class="form-input" placeholder="mysite.com" style="font-family: var(--mono);">
+                <div class="form-hint">Enter your domain if you want automatic DNS/SSL configuration.</div>
+            </div>
+
+            <div class="step-actions">
+                <button class="btn btn-ghost" id="btn-step2-back">Back</button>
+                <button class="btn btn-primary" id="btn-step2-next" disabled>Start Migration</button>
+            </div>
+        </div>
+
+        <!-- ======= STEP 3: AI PROCESSING ======= -->
+        <div class="step-panel" id="step-3">
+            <div class="step-header">
+                <h1>AI is migrating your site</h1>
+                <p>Watch every step as your site is analyzed, converted, and deployed.</p>
+            </div>
+
+            <div class="ai-processing-container">
+                <div class="terminal-panel">
+                    <div class="terminal-header">
+                        <div class="terminal-dots"><span></span><span></span><span></span></div>
+                        <div class="terminal-title">SiteMove AI Engine v2.1</div>
+                    </div>
+                    <div class="terminal-body" id="terminal-output">
+                    </div>
+                </div>
+
+                <div class="side-panel">
+                    <div class="progress-card">
+                        <h3>Migration Progress</h3>
+                        <div id="phase-list">
+                            <div class="progress-phase" id="phase-scan">
+                                <div class="icon">&#128269;</div>
+                                <div class="phase-info">
+                                    <div class="phase-name">Scanning Source</div>
+                                    <div class="phase-detail">Analyzing site structure</div>
+                                </div>
+                            </div>
+                            <div class="progress-phase" id="phase-extract">
+                                <div class="icon">&#128230;</div>
+                                <div class="phase-info">
+                                    <div class="phase-name">Extracting Content</div>
+                                    <div class="phase-detail">Pages, assets, styles</div>
+                                </div>
+                            </div>
+                            <div class="progress-phase" id="phase-convert">
+                                <div class="icon">&#129302;</div>
+                                <div class="phase-info">
+                                    <div class="phase-name">AI Conversion</div>
+                                    <div class="phase-detail">Re-creating for target</div>
+                                </div>
+                            </div>
+                            <div class="progress-phase" id="phase-optimize">
+                                <div class="icon">&#9889;</div>
+                                <div class="phase-info">
+                                    <div class="phase-name">Optimizing</div>
+                                    <div class="phase-detail">Images, CSS, JS</div>
+                                </div>
+                            </div>
+                            <div class="progress-phase" id="phase-deploy">
+                                <div class="icon">&#128640;</div>
+                                <div class="phase-info">
+                                    <div class="phase-name">Deploying</div>
+                                    <div class="phase-detail">Publishing to target</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overall-progress">
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" id="progress-fill"></div>
+                            </div>
+                            <div class="progress-pct">
+                                <span id="progress-text">0%</span>
+                                <span id="progress-phase-text">Initializing...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="file-tree-card">
+                        <h3>Generated Files</h3>
+                        <div id="file-tree-output">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======= STEP 4: COMPLETION ======= -->
+        <div class="step-panel" id="step-4">
+            <div class="completion-container">
+                <div class="completion-icon">&#10003;</div>
+                <h1>Migration Complete!</h1>
+                <p>Your site has been successfully migrated and deployed.</p>
+
+                <div class="completion-stats">
+                    <div class="comp-stat">
+                        <div class="val" id="final-pages" style="color: var(--brand-primary);">4</div>
+                        <div class="lbl">Pages Migrated</div>
+                    </div>
+                    <div class="comp-stat">
+                        <div class="val" id="final-files" style="color: var(--brand-secondary);">18</div>
+                        <div class="lbl">Files Generated</div>
+                    </div>
+                    <div class="comp-stat">
+                        <div class="val" id="final-size" style="color: var(--brand-accent);">1.1MB</div>
+                        <div class="lbl">Total Size</div>
+                    </div>
+                    <div class="comp-stat">
+                        <div class="val" id="final-time" style="color: var(--warning);">47s</div>
+                        <div class="lbl">Migration Time</div>
+                    </div>
+                </div>
+
+                <div class="completion-actions">
+                    <button class="btn btn-success btn-large" onclick="window.open('#','_blank')">Visit Your Site</button>
+                    <button class="btn btn-primary btn-large" onclick="window.location='dashboard.html'">Go to Dashboard</button>
+                    <button class="btn btn-secondary btn-large" id="btn-download">Download Files</button>
+                </div>
+
+                <div class="completion-details">
+                    <h3>Migration Summary</h3>
+                    <div class="detail-row">
+                        <span class="label">Source</span>
+                        <span class="value" id="sum-source">portfolio.lovable.app</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Destination</span>
+                        <span class="value" id="sum-dest">WordPress Theme</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Framework Detected</span>
+                        <span class="value" id="sum-framework">React + Vite</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Status</span>
+                        <span class="status-badge live">Live</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Migration ID</span>
+                        <span class="value" id="sum-id">SM-2026-0205-A1B2</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        // State
+        let currentStep = 1;
+        let selectedDest = null;
+        let sourceUrl = '';
+        let detectedPlatform = null;
+        let migrationStartTime = null;
+
+        // Elements
+        const steps = {
+            1: document.getElementById('step-1'),
+            2: document.getElementById('step-2'),
+            3: document.getElementById('step-3'),
+            4: document.getElementById('step-4')
+        };
+        const navSteps = {
+            1: document.getElementById('nav-step-1'),
+            2: document.getElementById('nav-step-2'),
+            3: document.getElementById('nav-step-3'),
+            4: document.getElementById('nav-step-4')
+        };
+
+        // Navigate steps
+        function goToStep(step) {
+            steps[currentStep].classList.remove('active');
+            navSteps[currentStep].classList.remove('active');
+            navSteps[currentStep].classList.add('completed');
+
+            currentStep = step;
+            steps[currentStep].classList.add('active');
+            navSteps[currentStep].classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // Platform detection
+        const platforms = {
+            'lovable.app': { name: 'Lovable', framework: 'React + Vite', pages: 4, components: 12, assets: 24, size: '4.2MB' },
+            'lovable.dev': { name: 'Lovable', framework: 'React + Vite', pages: 4, components: 12, assets: 24, size: '4.2MB' },
+            'cursor.sh': { name: 'Cursor', framework: 'Next.js', pages: 6, components: 18, assets: 32, size: '5.8MB' },
+            'bolt.new': { name: 'Bolt.new', framework: 'React + Vite', pages: 3, components: 8, assets: 15, size: '2.9MB' },
+            'v0.dev': { name: 'Vercel v0', framework: 'Next.js + Tailwind', pages: 5, components: 22, assets: 18, size: '3.5MB' },
+            'replit.app': { name: 'Replit', framework: 'React', pages: 3, components: 10, assets: 12, size: '2.1MB' },
+            'replit.dev': { name: 'Replit', framework: 'React', pages: 3, components: 10, assets: 12, size: '2.1MB' },
+        };
+
+        function detectPlatform(url) {
+            const badge = document.getElementById('platform-badge');
+            const scanResults = document.getElementById('scan-results');
+            const btn = document.getElementById('btn-step1-next');
+
+            try {
+                const hostname = new URL(url).hostname;
+                for (const [domain, info] of Object.entries(platforms)) {
+                    if (hostname.includes(domain)) {
+                        badge.textContent = info.name + ' Detected';
+                        badge.classList.add('detected');
+                        detectedPlatform = info;
+                        showScanResults(info);
+                        btn.disabled = false;
+                        return;
+                    }
+                }
+                // Unknown URL but valid
+                badge.textContent = 'Custom Site';
+                badge.classList.add('detected');
+                detectedPlatform = { name: 'Custom', framework: 'Static HTML', pages: 3, components: 6, assets: 10, size: '1.8MB' };
+                showScanResults(detectedPlatform);
+                btn.disabled = false;
+            } catch(e) {
+                badge.textContent = 'Enter valid URL';
+                badge.classList.remove('detected');
+                scanResults.classList.remove('visible');
+                btn.disabled = true;
+                detectedPlatform = null;
+            }
+        }
+
+        function showScanResults(info) {
+            document.getElementById('scan-pages').textContent = info.pages;
+            document.getElementById('scan-components').textContent = info.components;
+            document.getElementById('scan-assets').textContent = info.assets;
+            document.getElementById('scan-size').textContent = info.size;
+            document.getElementById('scan-results').classList.add('visible');
+        }
+
+        // URL input listener
+        let urlTimeout;
+        document.getElementById('source-url').addEventListener('input', function() {
+            clearTimeout(urlTimeout);
+            const val = this.value.trim();
+            if (val.length > 8) {
+                urlTimeout = setTimeout(() => detectPlatform(val.startsWith('http') ? val : 'https://' + val), 400);
+            } else {
+                document.getElementById('platform-badge').textContent = 'Waiting...';
+                document.getElementById('platform-badge').classList.remove('detected');
+                document.getElementById('scan-results').classList.remove('visible');
+                document.getElementById('btn-step1-next').disabled = true;
+            }
+        });
+
+        // Step 1 -> Step 2
+        document.getElementById('btn-step1-next').addEventListener('click', function() {
+            sourceUrl = document.getElementById('source-url').value.trim();
+            goToStep(2);
+        });
+
+        // Destination selection
+        document.querySelectorAll('.option-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedDest = this.dataset.dest;
+                document.getElementById('btn-step2-next').disabled = false;
+            });
+        });
+
+        // Step 2 back
+        document.getElementById('btn-step2-back').addEventListener('click', function() {
+            steps[currentStep].classList.remove('active');
+            navSteps[currentStep].classList.remove('active');
+            currentStep = 1;
+            navSteps[1].classList.remove('completed');
+            navSteps[1].classList.add('active');
+            steps[1].classList.add('active');
+        });
+
+        // Step 2 -> Step 3 (start migration)
+        document.getElementById('btn-step2-next').addEventListener('click', function() {
+            goToStep(3);
+            migrationStartTime = Date.now();
+            runMigration();
+        });
+
+        // ====== AI MIGRATION SIMULATION ======
+        const terminalEl = document.getElementById('terminal-output');
+        const fileTreeEl = document.getElementById('file-tree-output');
+
+        function addLog(text, cls) {
+            const ts = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const line = document.createElement('div');
+            line.className = 'log-line ' + (cls || 'info');
+            line.innerHTML = '<span class="ts">' + ts + '</span>' + text;
+            terminalEl.appendChild(line);
+            terminalEl.scrollTop = terminalEl.scrollHeight;
+        }
+
+        function addFile(name, indent, isFolder, size) {
+            const entry = document.createElement('div');
+            entry.className = 'file-entry ' + (isFolder ? 'folder' : 'file');
+            const indentCls = indent === 1 ? 'indent-1' : indent === 2 ? 'indent-2' : '';
+            entry.innerHTML =
+                '<span class="f-icon ' + indentCls + '">' + (isFolder ? '&#128193;' : '&#128196;') + '</span> ' +
+                name +
+                (size ? '<span class="size">' + size + '</span>' : '');
+            fileTreeEl.appendChild(entry);
+        }
+
+        function setPhase(id, state) {
+            const el = document.getElementById('phase-' + id);
+            el.className = 'progress-phase ' + state;
+        }
+
+        function setProgress(pct, text) {
+            document.getElementById('progress-fill').style.width = pct + '%';
+            document.getElementById('progress-text').textContent = pct + '%';
+            if (text) document.getElementById('progress-phase-text').textContent = text;
+        }
+
+        function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+        const destNames = {
+            'wordpress': 'WordPress Theme',
+            'cpanel-static': 'cPanel Static Site',
+            'cpanel-node': 'cPanel + Node.js',
+            'cpanel-docker': 'cPanel + Docker'
+        };
+
+        async function runMigration() {
+            const info = detectedPlatform;
+            const dest = destNames[selectedDest] || 'WordPress Theme';
+            const url = sourceUrl.replace(/^https?:\/\//, '');
+
+            // Phase 1: Scanning
+            setPhase('scan', 'active');
+            setProgress(2, 'Scanning source site...');
+
+            addLog('$ sitemove migrate --source ' + url, 'cmd');
+            await delay(600);
+            addLog('Initializing SiteMove AI Engine v2.1...', 'info');
+            await delay(400);
+            addLog('Connecting to source: ' + url, 'info');
+            await delay(800);
+            addLog('&#10003; Connection established (TLS 1.3)', 'success');
+            setProgress(8, 'Analyzing framework...');
+            await delay(600);
+            addLog('Analyzing page structure...', 'info');
+            await delay(700);
+            addLog('&#10003; Detected framework: ' + info.framework, 'success');
+            await delay(400);
+            addLog('&#10003; Found ' + info.pages + ' pages, ' + info.components + ' components', 'success');
+            await delay(300);
+            addLog('&#10003; Found ' + info.assets + ' static assets (' + info.size + ')', 'success');
+            setProgress(15, 'Scan complete');
+            await delay(300);
+            addLog('&#10003; Site scan complete', 'highlight');
+
+            setPhase('scan', 'done');
+
+            // Phase 2: Extracting
+            setPhase('extract', 'active');
+            setProgress(20, 'Extracting content...');
+            await delay(500);
+
+            addLog('', 'info');
+            addLog('$ Extracting site content...', 'cmd');
+            await delay(400);
+
+            const pageNames = ['Home', 'About', 'Projects', 'Contact', 'Blog', 'Services'];
+            for (let i = 0; i < info.pages; i++) {
+                await delay(350);
+                addLog('  Extracting page: /' + (i === 0 ? '' : pageNames[i]?.toLowerCase() || 'page-' + i), 'info');
+                await delay(200);
+                addLog('  &#10003; DOM parsed, ' + (Math.floor(Math.random() * 8) + 3) + ' sections found', 'success');
+                setProgress(20 + Math.round((i + 1) / info.pages * 15), 'Extracting pages...');
+            }
+
+            await delay(400);
+            addLog('Extracting CSS stylesheets...', 'info');
+            await delay(500);
+            addLog('&#10003; ' + (Math.floor(Math.random() * 4) + 2) + ' stylesheets extracted (' + Math.floor(Math.random() * 30 + 20) + 'KB)', 'success');
+            setProgress(38, 'Extracting styles...');
+            await delay(300);
+            addLog('Extracting JavaScript modules...', 'info');
+            await delay(500);
+            addLog('&#10003; ' + (Math.floor(Math.random() * 6) + 3) + ' JS modules extracted', 'success');
+            await delay(300);
+            addLog('Downloading images and media...', 'info');
+            await delay(800);
+            addLog('&#10003; ' + info.assets + ' assets downloaded (' + info.size + ')', 'success');
+            setProgress(45, 'Extraction complete');
+            await delay(200);
+            addLog('&#10003; Content extraction complete', 'highlight');
+
+            setPhase('extract', 'done');
+
+            // Phase 3: AI Conversion
+            setPhase('convert', 'active');
+            setProgress(48, 'Starting AI conversion...');
+            await delay(500);
+
+            addLog('', 'info');
+            addLog('$ AI conversion engine starting...', 'cmd');
+            await delay(400);
+            addLog('Target platform: ' + dest, 'info');
+            await delay(300);
+
+            if (selectedDest === 'wordpress') {
+                addLog('Generating WordPress theme structure...', 'info');
+                await delay(400);
+                addFile('wp-content/themes/sitemove-theme/', 0, true);
+                await delay(200);
+
+                addLog('&#10003; Generated style.css with theme metadata', 'success');
+                addFile('style.css', 1, false, '12KB');
+                setProgress(52, 'Generating theme...');
+                await delay(300);
+
+                addLog('Analyzing navigation structure...', 'info');
+                await delay(400);
+                addLog('&#10003; Nav: ' + pageNames.slice(0, info.pages).join(', '), 'success');
+                await delay(200);
+
+                addLog('Converting components to WordPress templates...', 'info');
+                await delay(500);
+                addLog('&#10003; Generated functions.php', 'success');
+                addFile('functions.php', 1, false, '8KB');
+                await delay(250);
+                addLog('&#10003; Generated header.php with responsive nav', 'success');
+                addFile('header.php', 1, false, '4KB');
+                setProgress(58, 'Converting templates...');
+                await delay(250);
+                addLog('&#10003; Generated footer.php', 'success');
+                addFile('footer.php', 1, false, '3KB');
+                await delay(200);
+                addLog('&#10003; Generated index.php', 'success');
+                addFile('index.php', 1, false, '5KB');
+                setProgress(62, 'Converting pages...');
+
+                for (let i = 1; i < info.pages; i++) {
+                    await delay(350);
+                    const pName = pageNames[i]?.toLowerCase() || 'page-' + i;
+                    addLog('  Converting ' + pageNames[i] + ' page to page-' + pName + '.php', 'info');
+                    await delay(300);
+                    addLog('  &#10003; Generated page-' + pName + '.php', 'success');
+                    addFile('page-' + pName + '.php', 1, false, Math.floor(Math.random() * 4 + 2) + 'KB');
+                    setProgress(62 + Math.round((i / info.pages) * 8), 'Converting pages...');
+                }
+
+                await delay(300);
+                addLog('Extracting color palette...', 'info');
+                await delay(400);
+                addLog('&#10003; Colors: #6C3CE1, #00D4AA, #0A0A0F, #F0F0F5', 'success');
+                await delay(200);
+                addLog('Generating CSS custom properties...', 'info');
+                await delay(350);
+                addLog('&#10003; Theme uses CSS variables for easy customization', 'success');
+
+                addFile('assets/', 1, true);
+                addFile('main.js', 2, false, '6KB');
+                addFile('responsive.css', 2, false, '4KB');
+
+                setProgress(72, 'Templates generated');
+
+            } else if (selectedDest === 'cpanel-static') {
+                addLog('Generating optimized static site...', 'info');
+                await delay(400);
+                addFile('public_html/', 0, true);
+                addLog('&#10003; Generated index.html', 'success');
+                addFile('index.html', 1, false, '15KB');
+                setProgress(55, 'Generating HTML...');
+                for (let i = 1; i < info.pages; i++) {
+                    await delay(300);
+                    const pName = pageNames[i]?.toLowerCase() || 'page-' + i;
+                    addLog('&#10003; Generated ' + pName + '.html', 'success');
+                    addFile(pName + '.html', 1, false, Math.floor(Math.random() * 8 + 4) + 'KB');
+                    setProgress(55 + Math.round((i / info.pages) * 10), 'Generating pages...');
+                }
+                await delay(300);
+                addFile('css/', 1, true);
+                addLog('&#10003; Generated styles.css', 'success');
+                addFile('styles.css', 2, false, '18KB');
+                addFile('js/', 1, true);
+                addLog('&#10003; Generated app.js', 'success');
+                addFile('app.js', 2, false, '8KB');
+                setProgress(72, 'Static site generated');
+
+            } else if (selectedDest === 'cpanel-node') {
+                addLog('Generating Node.js application...', 'info');
+                await delay(400);
+                addFile('app/', 0, true);
+                addLog('&#10003; Generated package.json', 'success');
+                addFile('package.json', 1, false, '1KB');
+                await delay(300);
+                addLog('&#10003; Generated server.js (Express)', 'success');
+                addFile('server.js', 1, false, '4KB');
+                setProgress(55, 'Generating server...');
+                await delay(400);
+                addFile('views/', 1, true);
+                for (let i = 0; i < info.pages; i++) {
+                    await delay(250);
+                    const pName = i === 0 ? 'index' : (pageNames[i]?.toLowerCase() || 'page-' + i);
+                    addLog('&#10003; Generated ' + pName + '.ejs', 'success');
+                    addFile(pName + '.ejs', 2, false, Math.floor(Math.random() * 6 + 3) + 'KB');
+                }
+                setProgress(65, 'Generating routes...');
+                await delay(300);
+                addFile('routes/', 1, true);
+                addLog('&#10003; Generated routes/index.js', 'success');
+                addFile('index.js', 2, false, '3KB');
+                addFile('public/', 1, true);
+                addFile('css/', 2, true);
+                addFile('js/', 2, true);
+                addLog('&#10003; Generated .htaccess for cPanel Node.js', 'success');
+                addFile('.htaccess', 1, false, '1KB');
+                setProgress(72, 'Node.js app generated');
+
+            } else {
+                addLog('Generating Docker configuration...', 'info');
+                await delay(400);
+                addFile('app/', 0, true);
+                addLog('&#10003; Generated Dockerfile', 'success');
+                addFile('Dockerfile', 1, false, '2KB');
+                await delay(300);
+                addLog('&#10003; Generated docker-compose.yml', 'success');
+                addFile('docker-compose.yml', 1, false, '1KB');
+                setProgress(55, 'Generating Docker config...');
+                await delay(400);
+                addLog('&#10003; Generated nginx.conf', 'success');
+                addFile('nginx.conf', 1, false, '2KB');
+                addFile('src/', 1, true);
+                for (let i = 0; i < info.pages; i++) {
+                    await delay(200);
+                    const pName = i === 0 ? 'index' : (pageNames[i]?.toLowerCase() || 'page-' + i);
+                    addFile(pName + '.html', 2, false, Math.floor(Math.random() * 6 + 3) + 'KB');
+                }
+                addFile('assets/', 1, true);
+                setProgress(72, 'Docker config generated');
+            }
+
+            await delay(300);
+            addLog('&#10003; AI conversion complete', 'highlight');
+            setPhase('convert', 'done');
+
+            // Phase 4: Optimization
+            setPhase('optimize', 'active');
+            setProgress(75, 'Optimizing assets...');
+            await delay(400);
+
+            addLog('', 'info');
+            addLog('$ Optimizing output...', 'cmd');
+            await delay(300);
+            addLog('Converting images to WebP format...', 'info');
+            await delay(600);
+            const origSize = parseFloat(info.size);
+            const newSize = (origSize * 0.26).toFixed(1);
+            const pctSaved = Math.round((1 - 0.26) * 100);
+            addLog('&#10003; Image optimization: ' + info.size + ' &#8594; ' + newSize + 'MB (' + pctSaved + '% reduction)', 'success');
+            addFile('images/', selectedDest === 'wordpress' ? 1 : 1, true);
+            for (let i = 0; i < Math.min(info.assets, 6); i++) {
+                await delay(150);
+                addFile('img-' + (i + 1) + '.webp', 2, false, Math.floor(Math.random() * 80 + 20) + 'KB');
+            }
+            setProgress(82, 'Minifying code...');
+            await delay(400);
+            addLog('Minifying CSS...', 'info');
+            await delay(350);
+            addLog('&#10003; CSS minified: 18KB &#8594; 11KB', 'success');
+            await delay(300);
+            addLog('Minifying JavaScript...', 'info');
+            await delay(350);
+            addLog('&#10003; JS minified: 12KB &#8594; 7KB', 'success');
+            await delay(300);
+            addLog('Generating critical CSS...', 'info');
+            await delay(400);
+            addLog('&#10003; Inline critical CSS for above-the-fold content', 'success');
+            setProgress(90, 'Optimization complete');
+            await delay(200);
+            addLog('&#10003; All optimizations applied', 'highlight');
+
+            setPhase('optimize', 'done');
+
+            // Phase 5: Deploy
+            setPhase('deploy', 'active');
+            setProgress(92, 'Starting deployment...');
+            await delay(500);
+
+            addLog('', 'info');
+            addLog('$ Deploying to target...', 'cmd');
+            await delay(400);
+            addLog('Connecting to cPanel server...', 'info');
+            await delay(600);
+            addLog('&#10003; Connected to hosting (SSH)', 'success');
+            setProgress(94, 'Uploading files...');
+            await delay(400);
+            addLog('Uploading files...', 'info');
+            await delay(800);
+            addLog('&#10003; All files uploaded successfully', 'success');
+            setProgress(96, 'Configuring server...');
+            await delay(400);
+
+            const domain = document.getElementById('custom-domain').value.trim();
+            if (domain) {
+                addLog('Configuring domain: ' + domain, 'info');
+                await delay(500);
+                addLog('&#10003; DNS records configured', 'success');
+                await delay(300);
+                addLog('&#10003; SSL certificate provisioned (Let\'s Encrypt)', 'success');
+            }
+
+            if (selectedDest === 'wordpress') {
+                addLog('Installing WordPress theme...', 'info');
+                await delay(500);
+                addLog('&#10003; Theme activated successfully', 'success');
+                await delay(300);
+                addLog('Importing page content...', 'info');
+                await delay(600);
+                addLog('&#10003; All pages imported and published', 'success');
+            }
+
+            setProgress(100, 'Deployment complete!');
+            await delay(300);
+
+            addLog('', 'info');
+            addLog('========================================', 'success');
+            addLog('  MIGRATION COMPLETE', 'highlight');
+            addLog('  ' + info.pages + ' pages migrated to ' + dest, 'success');
+            addLog('  Status: LIVE', 'success');
+            addLog('========================================', 'success');
+
+            setPhase('deploy', 'done');
+
+            // Calculate time
+            const elapsed = Math.round((Date.now() - migrationStartTime) / 1000);
+
+            // Update completion stats
+            document.getElementById('final-pages').textContent = info.pages;
+            const totalFiles = fileTreeEl.querySelectorAll('.file-entry:not(.folder)').length;
+            document.getElementById('final-files').textContent = totalFiles;
+            document.getElementById('final-size').textContent = newSize + 'MB';
+            document.getElementById('final-time').textContent = elapsed + 's';
+            document.getElementById('sum-source').textContent = sourceUrl.replace(/^https?:\/\//, '');
+            document.getElementById('sum-dest').textContent = dest;
+            document.getElementById('sum-framework').textContent = info.framework;
+            document.getElementById('sum-id').textContent = 'SM-2026-' + String(new Date().getMonth() + 1).padStart(2, '0') + String(new Date().getDate()).padStart(2, '0') + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
+
+            // Auto advance after a pause
+            await delay(1500);
+            goToStep(4);
+        }
+    })();
+    </script>
+</body>
+</html>

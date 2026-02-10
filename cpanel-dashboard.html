@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cPanel - Hosting Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables - WHMCS Design System */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-purple: #6366f1;
+            --accent-orange: #f97316;
+            --sidebar-width: 240px;
+            --header-height: 56px;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+        }
+
+        /* Reset */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+        }
+
+        /* App Container */
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .top-header {
+            height: var(--header-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .logo-selector:hover {
+            background: var(--bg-secondary);
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg {
+            width: 18px;
+            height: 18px;
+            stroke: white;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .logo-text {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+
+        .logo-text span {
+            font-size: 10px;
+            vertical-align: super;
+            color: var(--text-muted);
+        }
+
+        .dropdown-icon {
+            color: var(--text-secondary);
+        }
+
+        .header-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border-color);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn {
+            width: 28px;
+            height: 28px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: var(--bg-secondary);
+            border-color: var(--text-muted);
+        }
+
+        .breadcrumb-current {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            min-width: 220px;
+        }
+
+        .search-box svg {
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 13px;
+            color: var(--text-primary);
+            flex: 1;
+            min-width: 0;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-shortcut {
+            font-size: 11px;
+            color: var(--text-muted);
+            background: var(--bg-primary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .header-icon-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: var(--radius-md);
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .header-icon-btn:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .notification-dot {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            border: 2px solid var(--bg-primary);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 8px 4px 12px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .user-profile:hover {
+            background: var(--bg-secondary);
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: flex;
+            flex: 1;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: var(--header-height);
+            height: calc(100vh - var(--header-height));
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-bottom: 2px;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .nav-item svg {
+            flex-shrink: 0;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: var(--accent-blue);
+            color: white;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .nav-section {
+            margin-top: 20px;
+        }
+
+        .nav-section-title {
+            display: block;
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-footer {
+            padding: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .page-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-secondary {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+            border-color: var(--text-muted);
+        }
+
+        .btn-primary {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: var(--accent-orange);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #ea580c;
+        }
+
+        /* Site Header Card */
+        .site-header-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .site-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .site-favicon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--accent-orange) 0%, #ea580c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .site-details h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .site-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .site-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .site-meta svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--accent-green);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .stat-icon.blue { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); }
+        .stat-icon.green { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); }
+        .stat-icon.purple { background: rgba(99, 102, 241, 0.1); color: var(--accent-purple); }
+        .stat-icon.orange { background: rgba(249, 115, 22, 0.1); color: var(--accent-orange); }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .stat-trend {
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        .stat-trend.up { color: var(--accent-green); }
+        .stat-trend.down { color: var(--accent-red); }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        /* Widgets */
+        .widget {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .widget-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .widget-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .widget-expand {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .widget-menu {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        .widget-content {
+            padding: 16px;
+        }
+
+        /* Traffic Chart */
+        .chart-placeholder {
+            height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 120px;
+            gap: 8px;
+        }
+
+        .bar-chart .bar {
+            flex: 1;
+            background: var(--accent-blue);
+            border-radius: 4px 4px 0 0;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .bar-chart .bar:hover {
+            opacity: 1;
+        }
+
+        .bar-chart .bar.highlight {
+            background: var(--accent-orange);
+            opacity: 1;
+        }
+
+        .chart-labels {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Donut Chart */
+        .donut-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .donut-chart {
+            width: 100px;
+            height: 100px;
+            flex-shrink: 0;
+        }
+
+        .donut-chart svg {
+            transform: rotate(-90deg);
+        }
+
+        .donut-legend h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .legend-item .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* Resource Usage */
+        .resource-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .resource-item:last-child {
+            border-bottom: none;
+        }
+
+        .resource-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .resource-bar {
+            flex: 1;
+            max-width: 120px;
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            margin: 0 12px;
+            overflow: hidden;
+        }
+
+        .resource-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .resource-fill.blue { background: var(--accent-blue); }
+        .resource-fill.green { background: var(--accent-green); }
+        .resource-fill.orange { background: var(--accent-orange); }
+        .resource-fill.purple { background: var(--accent-purple); }
+
+        .resource-value {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            min-width: 60px;
+            text-align: right;
+        }
+
+        /* Quick Actions */
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .action-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .action-icon {
+            width: 44px;
+            height: 44px;
+            margin: 0 auto 12px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .action-card:nth-child(1) .action-icon { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); }
+        .action-card:nth-child(2) .action-icon { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); }
+        .action-card:nth-child(3) .action-icon { background: rgba(99, 102, 241, 0.1); color: var(--accent-purple); }
+        .action-card:nth-child(4) .action-icon { background: rgba(249, 115, 22, 0.1); color: var(--accent-orange); }
+
+        .action-card h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .action-card p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Data Table Section */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .see-all {
+            font-size: 13px;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .see-all:hover {
+            text-decoration: underline;
+        }
+
+        .data-table-container {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            background: var(--bg-secondary);
+            font-weight: 500;
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table tbody tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .domain-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .domain-favicon {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .domain-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+
+        .action-btn {
+            background: transparent;
+            border: none;
+            padding: 4px 8px;
+            cursor: pointer;
+            color: var(--text-muted);
+            border-radius: var(--radius-sm);
+        }
+
+        .action-btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        /* Alert Banner */
+        .alert-banner {
+            background: var(--bg-primary);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-left: 4px solid var(--accent-yellow);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .alert-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-yellow);
+            font-size: 16px;
+        }
+
+        .alert-text h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .alert-text p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 60px;
+            }
+            .nav-item span,
+            .nav-section-title,
+            .nav-badge {
+                display: none;
+            }
+            .nav-item {
+                justify-content: center;
+                padding: 12px;
+            }
+            .quick-actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid,
+            .stats-row,
+            .quick-actions-grid {
+                grid-template-columns: 1fr;
+            }
+            .header-left .breadcrumb {
+                display: none;
+            }
+            .search-box {
+                display: none;
+            }
+            .site-header-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 16px;
+            }
+            .site-info {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <div class="logo-selector">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <span class="logo-text">cPanel<span>®</span></span>
+                    <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="header-divider"></div>
+                <nav class="breadcrumb">
+                    <button class="nav-btn">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <button class="nav-btn">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <span class="breadcrumb-current">Dashboard</span>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="search-box">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M11 11L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    <input type="text" placeholder="Search tools...">
+                    <span class="search-shortcut">⌘K</span>
+                </div>
+                <button class="header-icon-btn">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M10 2.5V4.16667M10 15.8333V17.5M4.10833 4.10833L5.28333 5.28333M14.7167 14.7167L15.8917 15.8917M2.5 10H4.16667M15.8333 10H17.5M4.10833 15.8917L5.28333 14.7167M14.7167 5.28333L15.8917 4.10833" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </button>
+                <button class="header-icon-btn">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M15 6.66667C15 5.34058 14.4732 4.06881 13.5355 3.13113C12.5979 2.19345 11.3261 1.66667 10 1.66667C8.67392 1.66667 7.40215 2.19345 6.46447 3.13113C5.52678 4.06881 5 5.34058 5 6.66667C5 12.5 2.5 14.1667 2.5 14.1667H17.5C17.5 14.1667 15 12.5 15 6.66667Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M11.4417 17.5C11.2952 17.7526 11.0849 17.9622 10.8319 18.1079C10.5788 18.2537 10.292 18.3304 10 18.3304C9.70802 18.3304 9.42116 18.2537 9.16814 18.1079C8.91513 17.9622 8.70484 17.7526 8.55833 17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="notification-dot"></span>
+                </button>
+                <div class="user-profile">
+                    <span class="user-name">Matt Russell</span>
+                    <div class="user-avatar">MR</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <nav class="sidebar-nav">
+                    <a class="nav-item active">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <rect x="2" y="2" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="11" y="2" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="2" y="11" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="11" y="11" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                        <span>Dashboard</span>
+                    </a>
+
+                    <div class="nav-section">
+                        <span class="nav-section-title">HOSTING</span>
+                        <a class="nav-item">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+                                <line x1="2" y1="10" x2="18" y2="10" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M10 2C12 4.5 13 7 13 10C13 13 12 15.5 10 18" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M10 2C8 4.5 7 7 7 10C7 13 8 15.5 10 18" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                            <span>Domains</span>
+                        </a>
+                        <a class="nav-item">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M4 4h12c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.5"/>
+                                <polyline points="18,6 10,11 2,6" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                            <span>Email</span>
+                            <span class="nav-badge">3</span>
+                        </a>
+                        <a class="nav-item">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M18 15a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                            <span>Files</span>
+                        </a>
+                        <a class="nav-item">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <ellipse cx="10" cy="5" rx="8" ry="3" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M18 10c0 1.66-3.58 3-8 3s-8-1.34-8-3" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M2 5v10c0 1.66 3.58 3 8 3s8-1.34 8-3V5" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                            <span>Databases</span>
+                        </a>
+                    </div>
+
+                    <div class="nav-section">
+                        <span class="nav-section-title">MANAGE</span>
+                        <a class="nav-item">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M10 18s6.67-3.33 6.67-8.33V4.17L10 1.67 3.33 4.17v5.5c0 5 6.67 8.33 6.67 8.33z" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                            <span>Security</span>
+                        </a>
+                        <a class="nav-item">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <line x1="15" y1="16.67" x2="15" y2="8.33" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                <line x1="10" y1="16.67" x2="10" y2="3.33" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                <line x1="5" y1="16.67" x2="5" y2="11.67" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <span>Analytics</span>
+                        </a>
+                        <a class="nav-item">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M15.83 17.5H4.17c-0.92 0-1.67-0.75-1.67-1.67V4.17c0-0.92 0.75-1.67 1.67-1.67h9.16l4.17 4.17v9.16c0 0.92-0.75 1.67-1.67 1.67z" stroke="currentColor" stroke-width="1.5"/>
+                                <polyline points="14.17,17.5 14.17,10.83 5.83,10.83 5.83,17.5" stroke="currentColor" stroke-width="1.5"/>
+                                <polyline points="5.83,2.5 5.83,6.67 12.5,6.67" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                            <span>Backups</span>
+                        </a>
+                    </div>
+
+                    <div class="nav-section">
+                        <span class="nav-section-title">APPS</span>
+                        <a class="nav-item">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M8 10H12M10 8V12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <span>WordPress</span>
+                            <span class="nav-badge">1</span>
+                        </a>
+                        <a class="nav-item">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M5 9L8 12L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M11 15H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <span>Terminal</span>
+                        </a>
+                    </div>
+                </nav>
+
+                <div class="sidebar-footer">
+                    <a class="nav-item">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <circle cx="10" cy="10" r="2" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M10 2V5M10 15V18M2 10H5M15 10H18M4.22 4.22L6.34 6.34M13.66 13.66L15.78 15.78M4.22 15.78L6.34 13.66M13.66 6.34L15.78 4.22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        <span>Settings</span>
+                    </a>
+                    <a class="nav-item">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M10 6V10M10 14H10.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        <span>Help</span>
+                    </a>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <div class="page-header">
+                    <h1>Dashboard</h1>
+                    <div class="page-actions">
+                        <button class="btn-secondary">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M2 10V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                <path d="M8 2V10M8 10L5 7M8 10L11 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Export
+                        </button>
+                        <button class="btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            Add Domain
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Site Header -->
+                <div class="site-header-card">
+                    <div class="site-info">
+                        <div class="site-favicon">LC</div>
+                        <div class="site-details">
+                            <h2>londoncolocation.com</h2>
+                            <div class="site-meta">
+                                <span>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                        <circle cx="12" cy="10" r="3"/>
+                                    </svg>
+                                    London, UK
+                                </span>
+                                <span>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                        <line x1="16" y1="2" x2="16" y2="6"/>
+                                        <line x1="8" y1="2" x2="8" y2="6"/>
+                                        <line x1="3" y1="10" x2="21" y2="10"/>
+                                    </svg>
+                                    Created Jan 2024
+                                </span>
+                                <span>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                    </svg>
+                                    SSL Active
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="status-indicator">
+                        <span class="status-dot"></span>
+                        Site Online
+                    </div>
+                </div>
+
+                <!-- Alert Banner -->
+                <div class="alert-banner">
+                    <div class="alert-content">
+                        <div class="alert-icon">⚠️</div>
+                        <div class="alert-text">
+                            <h4>SSL certificate expires in 14 days</h4>
+                            <p>Renew now to keep your site secure</p>
+                        </div>
+                    </div>
+                    <button class="btn-primary">Renew Certificate</button>
+                </div>
+
+                <!-- Stats Row -->
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <svg viewBox="0 0 20 20" fill="none">
+                                <path d="M17.5 10C17.5 14.1421 14.1421 17.5 10 17.5C5.85786 17.5 2.5 14.1421 2.5 10C2.5 5.85786 5.85786 2.5 10 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                <path d="M10 5V10L13.5 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value">24,521</span>
+                            <span class="stat-label">Visitors (30d)</span>
+                            <span class="stat-trend up">↑ 12%</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <svg viewBox="0 0 20 20" fill="none">
+                                <path d="M10 2V18M6 6L10 2L14 6M6 14L10 18L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value">5.6 GB</span>
+                            <span class="stat-label">Bandwidth</span>
+                            <span class="stat-trend up">↑ 8%</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple">
+                            <svg viewBox="0 0 20 20" fill="none">
+                                <rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M3 8H17" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value">2.5 GB</span>
+                            <span class="stat-label">Storage Used</span>
+                            <span class="stat-trend down">↓ 2%</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <svg viewBox="0 0 20 20" fill="none">
+                                <path d="M10 18s6.67-3.33 6.67-8.33V4.17L10 1.67 3.33 4.17v5.5c0 5 6.67 8.33 6.67 8.33z" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M7 10L9 12L13 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value">99.9%</span>
+                            <span class="stat-label">Uptime</span>
+                            <span class="stat-trend up">↑ 0.1%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Traffic Widget -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h3>Traffic Overview <span class="widget-expand">›</span></h3>
+                            <button class="widget-menu">⋮</button>
+                        </div>
+                        <div class="widget-content">
+                            <div class="chart-placeholder">
+                                <div class="bar-chart">
+                                    <div class="bar" style="height: 45%"></div>
+                                    <div class="bar" style="height: 60%"></div>
+                                    <div class="bar" style="height: 55%"></div>
+                                    <div class="bar" style="height: 75%"></div>
+                                    <div class="bar" style="height: 65%"></div>
+                                    <div class="bar highlight" style="height: 85%"></div>
+                                    <div class="bar" style="height: 70%"></div>
+                                </div>
+                                <div class="chart-labels">
+                                    <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Storage Widget -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h3>Storage Breakdown <span class="widget-expand">›</span></h3>
+                            <button class="widget-menu">⋮</button>
+                        </div>
+                        <div class="widget-content">
+                            <div class="donut-container">
+                                <div class="donut-chart">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e7eb" stroke-width="20"/>
+                                        <circle cx="50" cy="50" r="40" fill="none" stroke="#3B82F6" stroke-width="20"
+                                                stroke-dasharray="100 151" stroke-dashoffset="0"/>
+                                        <circle cx="50" cy="50" r="40" fill="none" stroke="#10B981" stroke-width="20"
+                                                stroke-dasharray="50 201" stroke-dashoffset="-100"/>
+                                        <circle cx="50" cy="50" r="40" fill="none" stroke="#F97316" stroke-width="20"
+                                                stroke-dasharray="30 221" stroke-dashoffset="-150"/>
+                                        <circle cx="50" cy="50" r="40" fill="none" stroke="#6366F1" stroke-width="20"
+                                                stroke-dasharray="21 230" stroke-dashoffset="-180"/>
+                                    </svg>
+                                </div>
+                                <div class="donut-legend">
+                                    <h4>2.5 GB of 10 GB</h4>
+                                    <div class="legend-item"><span class="dot" style="background: #3B82F6"></span> WordPress (40%)</div>
+                                    <div class="legend-item"><span class="dot" style="background: #10B981"></span> Emails (20%)</div>
+                                    <div class="legend-item"><span class="dot" style="background: #F97316"></span> Databases (12%)</div>
+                                    <div class="legend-item"><span class="dot" style="background: #6366F1"></span> Other (8%)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resources Widget -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h3>Resource Usage <span class="widget-expand">›</span></h3>
+                            <button class="widget-menu">⋮</button>
+                        </div>
+                        <div class="widget-content">
+                            <div class="resource-item">
+                                <span class="resource-label">CPU</span>
+                                <div class="resource-bar">
+                                    <div class="resource-fill blue" style="width: 35%"></div>
+                                </div>
+                                <span class="resource-value">35%</span>
+                            </div>
+                            <div class="resource-item">
+                                <span class="resource-label">Memory</span>
+                                <div class="resource-bar">
+                                    <div class="resource-fill green" style="width: 62%"></div>
+                                </div>
+                                <span class="resource-value">62%</span>
+                            </div>
+                            <div class="resource-item">
+                                <span class="resource-label">I/O</span>
+                                <div class="resource-bar">
+                                    <div class="resource-fill orange" style="width: 18%"></div>
+                                </div>
+                                <span class="resource-value">18%</span>
+                            </div>
+                            <div class="resource-item">
+                                <span class="resource-label">Processes</span>
+                                <div class="resource-bar">
+                                    <div class="resource-fill purple" style="width: 45%"></div>
+                                </div>
+                                <span class="resource-value">45/100</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="section-header">
+                    <h2 class="section-title">Quick Actions</h2>
+                    <a href="#" class="see-all">See all tools →</a>
+                </div>
+                <div class="quick-actions-grid">
+                    <div class="action-card">
+                        <div class="action-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                            </svg>
+                        </div>
+                        <h4>File Manager</h4>
+                        <p>Browse & edit files</p>
+                    </div>
+                    <div class="action-card">
+                        <div class="action-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <polyline points="22,6 12,13 2,6"/>
+                            </svg>
+                        </div>
+                        <h4>Email Accounts</h4>
+                        <p>Create & manage</p>
+                    </div>
+                    <div class="action-card">
+                        <div class="action-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                            </svg>
+                        </div>
+                        <h4>Databases</h4>
+                        <p>MySQL & phpMyAdmin</p>
+                    </div>
+                    <div class="action-card">
+                        <div class="action-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                                <polyline points="17 21 17 13 7 13 7 21"/>
+                                <polyline points="7 3 7 8 15 8"/>
+                            </svg>
+                        </div>
+                        <h4>Backup</h4>
+                        <p>Download backup</p>
+                    </div>
+                </div>
+
+                <!-- Recent Domains Table -->
+                <div class="section-header" style="margin-top: 24px;">
+                    <h2 class="section-title">Addon Domains</h2>
+                    <a href="#" class="see-all">Manage domains →</a>
+                </div>
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Domain</th>
+                                <th>Status</th>
+                                <th>SSL</th>
+                                <th>Document Root</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="domain-cell">
+                                        <div class="domain-favicon">LC</div>
+                                        <span class="domain-name">londoncolocation.com</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td><span class="badge badge-success">Valid</span></td>
+                                <td>/public_html</td>
+                                <td>
+                                    <button class="action-btn">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                            <circle cx="8" cy="3" r="1" fill="currentColor"/>
+                                            <circle cx="8" cy="8" r="1" fill="currentColor"/>
+                                            <circle cx="8" cy="13" r="1" fill="currentColor"/>
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="domain-cell">
+                                        <div class="domain-favicon">BL</div>
+                                        <span class="domain-name">blog.londoncolocation.com</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td><span class="badge badge-success">Valid</span></td>
+                                <td>/public_html/blog</td>
+                                <td>
+                                    <button class="action-btn">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                            <circle cx="8" cy="3" r="1" fill="currentColor"/>
+                                            <circle cx="8" cy="8" r="1" fill="currentColor"/>
+                                            <circle cx="8" cy="13" r="1" fill="currentColor"/>
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="domain-cell">
+                                        <div class="domain-favicon">ST</div>
+                                        <span class="domain-name">staging.londoncolocation.com</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge badge-warning">Paused</span></td>
+                                <td><span class="badge badge-info">Pending</span></td>
+                                <td>/public_html/staging</td>
+                                <td>
+                                    <button class="action-btn">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                            <circle cx="8" cy="3" r="1" fill="currentColor"/>
+                                            <circle cx="8" cy="8" r="1" fill="currentColor"/>
+                                            <circle cx="8" cy="13" r="1" fill="currentColor"/>
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>
